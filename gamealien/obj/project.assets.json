@@ -4159,24 +4159,26 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\erens\\.nuget\\packages\\": {}
+    "C:\\Users\\H-LAB06-010\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\erens\\Desktop\\Create With Code\\Gameprogram22\\gamealien\\gamealien.csproj",
+      "projectUniqueName": "C:\\Users\\H-LAB06-010\\Documents\\GitHub\\Gameprogram22\\gamealien\\gamealien.csproj",
       "projectName": "gamealien",
-      "projectPath": "C:\\Users\\erens\\Desktop\\Create With Code\\Gameprogram22\\gamealien\\gamealien.csproj",
-      "packagesPath": "C:\\Users\\erens\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\erens\\Desktop\\Create With Code\\Gameprogram22\\gamealien\\obj\\",
+      "projectPath": "C:\\Users\\H-LAB06-010\\Documents\\GitHub\\Gameprogram22\\gamealien\\gamealien.csproj",
+      "packagesPath": "C:\\Users\\H-LAB06-010\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\H-LAB06-010\\Documents\\GitHub\\Gameprogram22\\gamealien\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\erens\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\H-LAB06-010\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net8.0-windows"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
