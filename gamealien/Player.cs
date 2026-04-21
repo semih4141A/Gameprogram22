@@ -11,4 +11,9 @@ public class Player : BaseCharacter
         MaxMP = mp;
         CurrentMP = mp;
     }
+
+    
+    
+        
+    
 }

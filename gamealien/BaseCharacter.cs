@@ -24,4 +24,10 @@ public class BaseCharacter
         spriteBatch.Draw(Sprite, new Rectangle((int)Position.X, (int)Position.Y, 50, 50), characterColor);
 
     }
+
+    public virtual void TakeDamage(int damage)
+    {
+        CurrentHP -= damage;
+        if (CurrentHP < 0) CurrentHP = 0;
+    }
 }

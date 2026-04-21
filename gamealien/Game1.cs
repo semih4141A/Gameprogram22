@@ -10,8 +10,8 @@ public class Game1 : Game
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
 
-    List<BaseCharacter> allies = new List<BaseCharacter>();
-    List<BaseCharacter> enemies = new List<BaseCharacter>();
+    List<Player> allies = new List<Player>();
+    List<Enemy> enemies = new List<Enemy>();
 
     Texture2D pixel;
 
@@ -25,12 +25,12 @@ public class Game1 : Game
     protected override void Initialize()
     {
         allies.Add(new Player("Player", 100, 50, 20, new Vector2(300, 200)));
-        allies.Add(new BaseCharacter("Ally1", 60, 15, new Vector2(200, 200)));
-        allies.Add(new BaseCharacter("Ally2", 70, 18, new Vector2(100, 200)));
+        allies.Add(new Player("Ally1", 60, 15, 20, new Vector2(200, 200)));
+        allies.Add(new Player("Ally2", 70, 18, 20, new Vector2(100, 200)));
 
-        enemies.Add(new BaseCharacter("Enemy1", 40, 10, new Vector2(500, 200)));
-        enemies.Add(new BaseCharacter("Enemy2", 80, 25, new Vector2(580, 200)));
-        enemies.Add(new BaseCharacter("Enemy3", 30, 5, new Vector2(660, 200)));
+        enemies.Add(new Enemy("Enemy1", 40, 10, new Vector2(500, 200)));
+        enemies.Add(new Enemy("Enemy2", 80, 25, new Vector2(580, 200)));
+        enemies.Add(new Enemy("Enemy3", 30, 5, new Vector2(660, 200)));
 
         base.Initialize();
     }
@@ -51,8 +51,7 @@ public class Game1 : Game
 
     protected override void Update(GameTime gameTime)
     {
-        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-            Exit();
+        
 
 
         base.Update(gameTime);
