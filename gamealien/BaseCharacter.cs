@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -29,5 +30,16 @@ public class BaseCharacter
     {
         CurrentHP -= damage;
         if (CurrentHP < 0) CurrentHP = 0;
+    }
+
+    public virtual void Heal(int amount)
+    {
+        CurrentHP += amount;
+        if (CurrentHP > MaxHP) CurrentHP = MaxHP;
+    }
+
+    public virtual void ExecuteSkill(int skillIndex, List<Player> allies, List<Enemy> enemies, int targetIndex)
+    {
+
     }
 }
