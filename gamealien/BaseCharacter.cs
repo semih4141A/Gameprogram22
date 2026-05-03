@@ -38,7 +38,7 @@ public class BaseCharacter
         if (CurrentHP > MaxHP) CurrentHP = MaxHP;
     }
 
-    public virtual bool ExecuteSkill(int skillIndex, List<Player> allies, List<Enemy> enemies, int targetIndex)
+    public virtual bool ExecuteSkill(int skillIndex, List<Player> allies, List<Enemy> enemies, int targetIndex, bool isultimateunlocked)
     {
         return false;
 

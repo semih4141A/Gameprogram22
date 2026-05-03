@@ -17,6 +17,11 @@ public class Game1 : Game
     BattleState currentState = BattleState.PlayerTurn;
     int activeunitindex = 0;
 
+    int currentWave = 1;
+    bool isRenatoUltimateUnlocked = false;
+    bool isYaserUltimateUnlocked = false;
+    bool isLeroyUltimateUnlocked = false;
+
     KeyboardState oldState;
 
 
@@ -36,8 +41,8 @@ public class Game1 : Game
     protected override void Initialize()
     {
         allies.Add(new Player.Leroy("Ally1", 100, 50, 20, new Vector2(300, 200)));
-        allies.Add(new Player.Renato("Ally2", 60, 15, 20, new Vector2(200, 200)));
-        allies.Add(new Player.Yaser("Ally3", 70, 18, 20, new Vector2(100, 200)));
+        allies.Add(new Player.Renato("Ally2", 60, 50, 20, new Vector2(200, 200)));
+        allies.Add(new Player.Yaser("Ally3", 70, 50, 20, new Vector2(100, 200)));
 
         enemies.Add(new Enemy("Enemy1", 40, 10, new Vector2(500, 200)));
         enemies.Add(new Enemy("Enemy2", 80, 25, new Vector2(580, 200)));
@@ -68,7 +73,7 @@ public class Game1 : Game
         {
             if (kstate.IsKeyDown(Keys.Up) && oldState.IsKeyUp(Keys.Up)) selectedskillind--;
             if (kstate.IsKeyDown(Keys.Down) && oldState.IsKeyUp(Keys.Down)) selectedskillind++;
-            selectedskillind = MathHelper.Clamp(selectedskillind, 0, 1);
+            selectedskillind = MathHelper.Clamp(selectedskillind, 0, 3);
 
             if (!isskillselected)
             {
@@ -77,49 +82,112 @@ public class Game1 : Game
             }
             else
             {
-                if (kstate.IsKeyDown(Keys.Left) && oldState.IsKeyUp(Keys.Left)) selectedtargetind--;
-                if (kstate.IsKeyDown(Keys.Right) && oldState.IsKeyUp(Keys.Right)) selectedtargetind++;
-                selectedtargetind = MathHelper.Clamp(selectedtargetind, 0, enemies.Count - 1);
+                bool isFriendlyTarget = false;
+                if (activeunitindex == 1 && (selectedskillind == 1 || selectedskillind == 2)) isFriendlyTarget = true;
+                if (activeunitindex == 2 && selectedskillind == 2) isFriendlyTarget = true;
+
+                if (isFriendlyTarget)
+                {
+                    if (kstate.IsKeyDown(Keys.Left) && oldState.IsKeyUp(Keys.Left)) selectedtargetind++;
+                    if (kstate.IsKeyDown(Keys.Right) && oldState.IsKeyUp(Keys.Right)) selectedtargetind--;
+
+                    selectedtargetind = MathHelper.Clamp(selectedtargetind, 0, allies.Count - 1);
+
+                }
+
+                else
+                {
+                    if (kstate.IsKeyDown(Keys.Left) && oldState.IsKeyUp(Keys.Left)) selectedtargetind--;
+                    if (kstate.IsKeyDown(Keys.Right) && oldState.IsKeyUp(Keys.Right)) selectedtargetind++;
+
+                    selectedtargetind = MathHelper.Clamp(selectedtargetind, 0, enemies.Count - 1);
+                }
+
 
                 if (kstate.IsKeyDown(Keys.Enter) && oldState.IsKeyUp(Keys.Enter))
                 {
                     if (activeunitindex < allies.Count)
                     {
-                        allies[activeunitindex].ExecuteSkill(selectedskillind, allies, enemies, selectedtargetind);
+                        bool success = false;
+                        var currentPlayer = allies[activeunitindex];
 
-                        for (int i = enemies.Count - 1; i >= 0; i--)
+                        if (currentPlayer is Player.Renato)
+                            success = currentPlayer.ExecuteSkill(selectedskillind, allies, enemies, selectedtargetind, isRenatoUltimateUnlocked);
+                        else if (currentPlayer is Player.Yaser)
+                            success = currentPlayer.ExecuteSkill(selectedskillind, allies, enemies, selectedtargetind, isYaserUltimateUnlocked);
+                        else if (currentPlayer is Player.Leroy)
+                            success = currentPlayer.ExecuteSkill(selectedskillind, allies, enemies, selectedtargetind, isLeroyUltimateUnlocked);
+
+                        if (success)
                         {
-                            if (enemies[i].CurrentHP <= 0)
+                            for (int i = enemies.Count - 1; i >= 0; i--)
                             {
-                                enemies.RemoveAt(i);
+                                if (enemies[i].CurrentHP <= 0)
+                                {
+                                    enemies.RemoveAt(i);
+                                }
                             }
+
+                            if (selectedtargetind >= enemies.Count && enemies.Count > 0)
+                            {
+                                selectedtargetind = enemies.Count - 1;
+                            }
+
+                            isskillselected = false;
+                            activeunitindex++;
+
+                            if (activeunitindex >= allies.Count)
+                            {
+                                foreach (var ally in allies)
+                                {
+                                    ally.Attackpower = ally.BaseAttackPower;
+                                }
+                                currentState = BattleState.EnemyTurn;
+                                activeunitindex = 0;
+                            }
+
                         }
 
-                        if (selectedtargetind >= enemies.Count && enemies.Count > 0)
+                        else
                         {
-                            selectedtargetind = enemies.Count - 1;
+                            System.Console.WriteLine("Not enough MP or skill is locked");
                         }
 
-                        isskillselected = false;
-                        activeunitindex++;
 
-                        if (activeunitindex >= allies.Count)
-                        {
-                            currentState = BattleState.EnemyTurn;
-                            activeunitindex = 0;
-                        }
                     }
                 }
 
                 if (kstate.IsKeyDown(Keys.Back) && oldState.IsKeyUp(Keys.Back))
                     isskillselected = false;
             }
+
+            if (enemies.Count == 0)
+            {
+
+                currentWave++;
+
+
+                if (currentWave == 2) isRenatoUltimateUnlocked = true;
+                if (currentWave == 3) isYaserUltimateUnlocked = true;
+                if (currentWave == 4) isLeroyUltimateUnlocked = true;
+
+                enemies.Add(new Enemy("Enemy1", 40, 10, new Vector2(500, 200)));
+                enemies.Add(new Enemy("Enemy2", 80, 25, new Vector2(580, 200)));
+                enemies.Add(new Enemy("Enemy3", 30, 5, new Vector2(660, 200)));
+                foreach (var e in enemies) e.Sprite = pixel;
+
+                System.Diagnostics.Debug.WriteLine("New Wave " + currentWave);
+            }
         }
+
+
         else if (currentState == BattleState.EnemyTurn)
         {
             currentState = BattleState.PlayerTurn;
             activeunitindex = 0;
         }
+
+
 
         oldState = kstate;
         base.Update(gameTime);
@@ -133,6 +201,14 @@ public class Game1 : Game
         _spriteBatch.Draw(pixel, new Rectangle((int)position.X, (int)position.Y - 15, (int)(50 * healthPercent), 5), Color.Green);
     }
 
+    private void DrawManaBar(Vector2 position, int currentMP, int maxMP)
+    {
+        _spriteBatch.Draw(pixel, new Rectangle((int)position.X, (int)position.Y - 8, 50, 4), Color.Black * 0.5f);
+
+        float manaPercent = (float)currentMP / maxMP;
+        _spriteBatch.Draw(pixel, new Rectangle((int)position.X, (int)position.Y - 8, (int)(50 * manaPercent), 4), Color.DeepSkyBlue);
+    }
+
     protected override void Draw(GameTime gameTime)
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
@@ -140,33 +216,56 @@ public class Game1 : Game
 
         for (int i = 0; i < allies.Count; i++)
         {
-            Color c = (i == activeunitindex && currentState == BattleState.PlayerTurn) ? Color.Green : Color.Blue;
-            allies[i].Draw(_spriteBatch, c);
+            bool isHealing = (activeunitindex == 1 && (selectedskillind == 1 || selectedskillind == 2)) ||
+                             (activeunitindex == 2 && selectedskillind == 2);
 
+            bool isTargeted = (isskillselected && isHealing && selectedtargetind == i);
+
+            Color c = isTargeted ? Color.Yellow : (i == activeunitindex ? Color.Green : Color.Blue);
+            allies[i].Draw(_spriteBatch, c);
             DrawHealthBar(allies[i].Position, allies[i].CurrentHP, allies[i].MaxHP);
+            DrawManaBar(allies[i].Position, allies[i].CurrentMP, allies[i].MaxMP);
         }
 
         for (int i = 0; i < enemies.Count; i++)
         {
-            Color c = (i == selectedtargetind && isskillselected) ? Color.Yellow : Color.Red;
-            enemies[i].Draw(_spriteBatch, c);
+            bool isHealing = (activeunitindex == 1 && (selectedskillind == 1 || selectedskillind == 2)) ||
+                             (activeunitindex == 2 && selectedskillind == 2);
 
+            bool isTargeted = (isskillselected && !isHealing && selectedtargetind == i);
+
+            Color c = isTargeted ? Color.Yellow : Color.Red;
+            enemies[i].Draw(_spriteBatch, c);
             DrawHealthBar(enemies[i].Position, enemies[i].CurrentHP, enemies[i].MaxHP);
         }
 
         if (currentState == BattleState.PlayerTurn)
         {
-            _spriteBatch.Draw(pixel, new Rectangle(0, 350, 800, 150), Color.Black * 0.7f);
+            Vector2 pPos = allies[activeunitindex].Position;
 
-            Color s1Color = (selectedskillind == 0) ? Color.Gold : Color.Gray;
-            _spriteBatch.Draw(pixel, new Rectangle(50, 380, 100, 40), s1Color);
+            for (int i = 0; i < 4; i++)
+            {
+                Color boxColor = (selectedskillind == i) ? Color.Gold : Color.Gray * 0.6f;
 
-            Color s2Color = (selectedskillind == 1) ? Color.Gold : Color.Gray;
-            _spriteBatch.Draw(pixel, new Rectangle(160, 380, 100, 40), s2Color);
+                Rectangle skillBox = new Rectangle((int)pPos.X, (int)pPos.Y - 180 + (i * 40), 50, 30);
+
+                _spriteBatch.Draw(pixel, skillBox, boxColor);
+            }
+
 
             if (isskillselected)
             {
-                _spriteBatch.Draw(pixel, new Rectangle(380, 320, 40, 10), Color.Yellow);
+
+                bool isFriendlyTarget = (activeunitindex == 1 && (selectedskillind == 1 || selectedskillind == 2)) ||
+                                        (activeunitindex == 2 && selectedskillind == 2);
+
+                Vector2 targetPos;
+                if (isFriendlyTarget)
+                    targetPos = allies[selectedtargetind].Position;
+                else
+                    targetPos = enemies[selectedtargetind].Position;
+
+                _spriteBatch.Draw(pixel, new Rectangle((int)targetPos.X, (int)targetPos.Y + 100, 40, 10), Color.Yellow);
             }
         }
 
