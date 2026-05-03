@@ -8,6 +8,18 @@ public class Player : BaseCharacter
 
     public int BaseAttackPower { get; set; }
 
+    public void GainMP(int amount)
+    {
+        CurrentMP += amount;
+
+        if (CurrentMP > MaxMP)
+        {
+            CurrentMP = MaxMP;
+        }
+
+
+    }
+
     public Player(string name, int hp, int mp, int atk, Vector2 pos) :
      base(name, hp, atk, pos)
     {
@@ -15,6 +27,8 @@ public class Player : BaseCharacter
         CurrentMP = mp;
         BaseAttackPower = atk;
     }
+
+
 
     public class Leroy : Player
     {
@@ -37,6 +51,7 @@ public class Player : BaseCharacter
                 if (CurrentMP >= skill1manacost)
                 {
                     CurrentMP -= skill1manacost;
+                    GainMP(10);
                     enemies[targetIndex].TakeDamage(Attackpower);
                     return true;
                 }
@@ -107,7 +122,9 @@ public class Player : BaseCharacter
             {
                 if (CurrentMP >= skill1manacost)
                 {
+
                     CurrentMP -= skill1manacost;
+                    GainMP(10);
                     enemies[targetIndex].TakeDamage(Attackpower);
                     return true;
                 }
@@ -175,6 +192,7 @@ public class Player : BaseCharacter
                 if (CurrentMP >= skill1manacost)
                 {
                     CurrentMP -= skill1manacost;
+                    GainMP(10);
                     enemies[targetIndex].TakeDamage(Attackpower);
                     return true;
                 }
@@ -227,6 +245,8 @@ public class Player : BaseCharacter
             return false;
         }
     }
+
+
 
 
 

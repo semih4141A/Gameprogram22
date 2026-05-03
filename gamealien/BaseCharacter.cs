@@ -20,10 +20,19 @@ public class BaseCharacter
         Position = pos;
     }
 
-    public virtual void Draw(SpriteBatch spriteBatch, Color characterColor)
+    public virtual void Draw(SpriteBatch spriteBatch, Color characterColor, SpriteFont font)
     {
-        spriteBatch.Draw(Sprite, new Rectangle((int)Position.X, (int)Position.Y, 50, 50), characterColor);
+        Rectangle destRect = new Rectangle((int)Position.X, (int)Position.Y, 50, 50);
+        spriteBatch.Draw(Sprite, destRect, characterColor);
 
+        Vector2 nameSize = font.MeasureString(Name);
+
+        Vector2 textPosition = new Vector2(
+            Position.X + (50 / 2) - (nameSize.X / 2),
+            Position.Y + (50 / 2) - (nameSize.Y / 2)
+        );
+
+        spriteBatch.DrawString(font, Name, textPosition, Color.White);
     }
 
     public virtual void TakeDamage(int damage)

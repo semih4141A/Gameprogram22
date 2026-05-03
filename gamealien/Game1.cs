@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using SharpDX.Direct3D9;
 
 namespace gamealien;
 
@@ -9,6 +10,8 @@ public class Game1 : Game
 {
     private GraphicsDeviceManager _graphics;
     private SpriteBatch _spriteBatch;
+
+    SpriteFont gameFont;
 
     List<Player> allies = new List<Player>();
     List<Enemy> enemies = new List<Enemy>();
@@ -40,13 +43,13 @@ public class Game1 : Game
 
     protected override void Initialize()
     {
-        allies.Add(new Player.Leroy("Ally1", 100, 50, 20, new Vector2(300, 200)));
-        allies.Add(new Player.Renato("Ally2", 60, 50, 20, new Vector2(200, 200)));
-        allies.Add(new Player.Yaser("Ally3", 70, 50, 20, new Vector2(100, 200)));
+        allies.Add(new Player.Leroy("Leroy", 100, 50, 20, new Vector2(300, 200)));
+        allies.Add(new Player.Renato("Renato", 60, 50, 10, new Vector2(200, 200)));
+        allies.Add(new Player.Yaser("Yaser", 70, 50, 20, new Vector2(100, 200)));
 
-        enemies.Add(new Enemy("Enemy1", 40, 10, new Vector2(500, 200)));
-        enemies.Add(new Enemy("Enemy2", 80, 25, new Vector2(580, 200)));
-        enemies.Add(new Enemy("Enemy3", 30, 5, new Vector2(660, 200)));
+        enemies.Add(new Vampire("Vampire", 60, 12, new Vector2(500, 200)));
+        enemies.Add(new Skeleton("Skeleton", 40, 15, new Vector2(580, 200)));
+        enemies.Add(new Vampire("Vampire", 30, 5, new Vector2(660, 200)));
 
         base.Initialize();
     }
@@ -54,6 +57,7 @@ public class Game1 : Game
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
+        gameFont = Content.Load<SpriteFont>("GameFont");
 
         pixel = new Texture2D(GraphicsDevice, 1, 1);
         pixel.SetData(new[] { Color.White });
@@ -183,6 +187,10 @@ public class Game1 : Game
 
         else if (currentState == BattleState.EnemyTurn)
         {
+            foreach (var enemy in enemies)
+            {
+                enemy.TakeTurn(allies, enemies);
+            }
             currentState = BattleState.PlayerTurn;
             activeunitindex = 0;
         }
@@ -222,7 +230,7 @@ public class Game1 : Game
             bool isTargeted = (isskillselected && isHealing && selectedtargetind == i);
 
             Color c = isTargeted ? Color.Yellow : (i == activeunitindex ? Color.Green : Color.Blue);
-            allies[i].Draw(_spriteBatch, c);
+            allies[i].Draw(_spriteBatch, c, gameFont);
             DrawHealthBar(allies[i].Position, allies[i].CurrentHP, allies[i].MaxHP);
             DrawManaBar(allies[i].Position, allies[i].CurrentMP, allies[i].MaxMP);
         }
@@ -235,7 +243,7 @@ public class Game1 : Game
             bool isTargeted = (isskillselected && !isHealing && selectedtargetind == i);
 
             Color c = isTargeted ? Color.Yellow : Color.Red;
-            enemies[i].Draw(_spriteBatch, c);
+            enemies[i].Draw(_spriteBatch, c, gameFont);
             DrawHealthBar(enemies[i].Position, enemies[i].CurrentHP, enemies[i].MaxHP);
         }
 

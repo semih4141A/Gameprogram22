@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PipelineBuildEvent xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <SourceFile>c:/Users/erens/Desktop/Create With Code/Board game/Gameprogram22/gamealien/Content/File.spritefont</SourceFile>
+  <SourceTime>2026-05-03T22:14:29.6870908+03:00</SourceTime>
+  <DestFile>c:/Users/erens/Desktop/Create With Code/Board game/Gameprogram22/gamealien/Content/bin/Windows/Content/Gamefont.xnb</DestFile>
+  <DestTime>2026-05-03T22:14:34.1497673+03:00</DestTime>
+  <Importer>FontDescriptionImporter</Importer>
+  <ImporterTime>2025-06-02T13:31:02+03:00</ImporterTime>
+  <Processor>FontDescriptionProcessor</Processor>
+  <ProcessorTime>2025-06-02T13:31:02+03:00</ProcessorTime>
+  <Parameters>
+    <Key>PremultiplyAlpha</Key>
+    <Value>True</Value>
+  </Parameters>
+  <Parameters>
+    <Key>TextureFormat</Key>
+    <Value>Compressed</Value>
+  </Parameters>
+  <Dependencies />
+  <BuildAsset />
+  <BuildOutput />
+</PipelineBuildEvent>

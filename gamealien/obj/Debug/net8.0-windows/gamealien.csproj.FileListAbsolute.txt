@@ -81,3 +81,4 @@ c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\obj\D
 c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\obj\Debug\net8.0-windows\gamealien.pdb
 c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\obj\Debug\net8.0-windows\gamealien.genruntimeconfig.cache
 c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\obj\Debug\net8.0-windows\ref\gamealien.dll
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Gamefont.xnb
