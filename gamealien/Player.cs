@@ -20,22 +20,29 @@ public class Player : BaseCharacter
         {
         }
 
-        public override void ExecuteSkill(int skillIndex, List<Player> allies, List<Enemy> enemies, int targetIndex)
+        public override bool ExecuteSkill(int skillIndex, List<Player> allies, List<Enemy> enemies, int targetIndex)
         {
+            int skill1manacost = 0;
+            int skill2manacost = 20;
             if (skillIndex == 0)
             {
-                if (CurrentMP >= 0)
+                if (CurrentMP >= skill1manacost)
                 {
-                    CurrentMP -= 0;
+                    CurrentMP -= skill1manacost;
                     enemies[targetIndex].TakeDamage(Attackpower);
+                    return true;
                 }
             }
             else if (skillIndex == 1)
             {
-                CurrentMP -= 0;
-                enemies[targetIndex].TakeDamage(Attackpower);
-
+                if (CurrentMP >= skill2manacost)
+                {
+                    CurrentMP -= skill2manacost;
+                    enemies[targetIndex].TakeDamage(Attackpower);
+                    return true;
+                }
             }
+            return false;
         }
     }
 
@@ -46,22 +53,29 @@ public class Player : BaseCharacter
         {
         }
 
-        public override void ExecuteSkill(int skillIndex, List<Player> allies, List<Enemy> enemies, int targetIndex)
+        public override bool ExecuteSkill(int skillIndex, List<Player> allies, List<Enemy> enemies, int targetIndex)
         {
+            int skill1manacost = 10;
+            int skill2manacost = 20;
             if (skillIndex == 0)
             {
-                if (CurrentMP >= 0)
+                if (CurrentMP >= skill1manacost)
                 {
-                    CurrentMP -= 0;
+                    CurrentMP -= skill1manacost;
                     enemies[targetIndex].TakeDamage(Attackpower);
+                    return true;
                 }
             }
             else if (skillIndex == 1)
             {
-                CurrentMP -= 0;
-                enemies[targetIndex].TakeDamage(Attackpower);
-
+                if (CurrentMP >= skill2manacost)
+                {
+                    CurrentMP -= skill2manacost;
+                    enemies[targetIndex].TakeDamage(Attackpower);
+                    return true;
+                }
             }
+            return false;
         }
     }
 
@@ -73,23 +87,29 @@ public class Player : BaseCharacter
         {
         }
 
-        public override void ExecuteSkill(int skillIndex, List<Player> allies, List<Enemy> enemies, int targetIndex)
+        public override bool ExecuteSkill(int skillIndex, List<Player> allies, List<Enemy> enemies, int targetIndex)
         {
+            int skill1manacost = 10;
+            int skill2manacost = 20;
+
             if (skillIndex == 0)
             {
-                if (CurrentMP >= 0)
+                if (CurrentMP >= skill1manacost)
                 {
-                    CurrentMP -= 0;
+                    CurrentMP -= skill1manacost;
                     enemies[targetIndex].TakeDamage(Attackpower);
+                    return true;
                 }
             }
             else if (skillIndex == 1)
             {
 
-                CurrentMP -= 0;
+                CurrentMP -= skill2manacost;
                 enemies[targetIndex].TakeDamage(Attackpower);
+                return true;
 
             }
+            return false;
         }
     }
 
