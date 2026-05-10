@@ -16,11 +16,14 @@ public class Game1 : Game
     List<Player> allies = new List<Player>();
     List<Enemy> enemies = new List<Enemy>();
 
-    enum BattleState { PlayerTurn, EnemyTurn }
+    enum BattleState { PlayerTurn, EnemyTurn, GameOver, Victory }
     BattleState currentState = BattleState.PlayerTurn;
     int activeunitindex = 0;
 
     int currentWave = 1;
+
+    float enemyTurnTimer = 0;
+    int enemyIndex = 0;
     bool isRenatoUltimateUnlocked = false;
     bool isYaserUltimateUnlocked = false;
     bool isLeroyUltimateUnlocked = false;
@@ -44,12 +47,12 @@ public class Game1 : Game
     protected override void Initialize()
     {
         allies.Add(new Player.Leroy("Leroy", 100, 50, 20, new Vector2(300, 200)));
-        allies.Add(new Player.Renato("Renato", 60, 50, 10, new Vector2(200, 200)));
+        allies.Add(new Player.Renato("Renato", 60, 50, 15, new Vector2(200, 200)));
         allies.Add(new Player.Yaser("Yaser", 70, 50, 20, new Vector2(100, 200)));
 
         enemies.Add(new Vampire("Vampire", 60, 12, new Vector2(500, 200)));
         enemies.Add(new Skeleton("Skeleton", 40, 15, new Vector2(580, 200)));
-        enemies.Add(new Vampire("Vampire", 30, 5, new Vector2(660, 200)));
+        enemies.Add(new Vampire("Vampire", 60, 12, new Vector2(660, 200)));
 
         base.Initialize();
     }
@@ -72,6 +75,48 @@ public class Game1 : Game
     protected override void Update(GameTime gameTime)
     {
         var kstate = Keyboard.GetState();
+
+        if (currentState == BattleState.GameOver || currentState == BattleState.Victory)
+        {
+
+            return;
+        }
+
+        if (enemies.Count == 0)
+        {
+
+            currentWave++;
+
+
+            if (currentWave == 2) isRenatoUltimateUnlocked = true;
+            if (currentWave == 3) isYaserUltimateUnlocked = true;
+            if (currentWave == 4) isLeroyUltimateUnlocked = true;
+
+            if (currentWave == 2)
+            {
+                enemies.Add(new Zombie("Zombie", 60, 10, new Vector2(500, 200)));
+                enemies.Add(new Barbarian("Barbarian", 80, 15, new Vector2(580, 200)));
+                enemies.Add(new Zombie("Zombie", 60, 10, new Vector2(660, 200)));
+            }
+            else if (currentWave == 3)
+            {
+                enemies.Add(new Witch("Witch", 50, 20, new Vector2(500, 200)));
+                enemies.Add(new HealerGoblin("HealerGoblin", 50, 5, new Vector2(580, 200)));
+                enemies.Add(new Witch("Witch", 50, 20, new Vector2(660, 200)));
+            }
+            else if (currentWave == 4)
+            {
+                enemies.Add(new FinalBoss("FinalBoss", 300, 30, new Vector2(580, 200)));
+                enemies.Add(new Witch("Witch", 50, 20, new Vector2(500, 200)));
+                enemies.Add(new HealerGoblin("HealerGoblin", 50, 5, new Vector2(660, 200)));
+
+            }
+
+            foreach (var e in enemies) e.Sprite = pixel;
+            System.Diagnostics.Debug.WriteLine("New Wave " + currentWave);
+
+
+        }
 
         if (currentState == BattleState.PlayerTurn)
         {
@@ -142,12 +187,11 @@ public class Game1 : Game
 
                             if (activeunitindex >= allies.Count)
                             {
-                                foreach (var ally in allies)
-                                {
-                                    ally.Attackpower = ally.BaseAttackPower;
-                                }
+
                                 currentState = BattleState.EnemyTurn;
                                 activeunitindex = 0;
+                                enemyIndex = 0;
+                                enemyTurnTimer = 0f;
                             }
 
                         }
@@ -165,35 +209,60 @@ public class Game1 : Game
                     isskillselected = false;
             }
 
-            if (enemies.Count == 0)
-            {
-
-                currentWave++;
 
 
-                if (currentWave == 2) isRenatoUltimateUnlocked = true;
-                if (currentWave == 3) isYaserUltimateUnlocked = true;
-                if (currentWave == 4) isLeroyUltimateUnlocked = true;
 
-                enemies.Add(new Enemy("Enemy1", 40, 10, new Vector2(500, 200)));
-                enemies.Add(new Enemy("Enemy2", 80, 25, new Vector2(580, 200)));
-                enemies.Add(new Enemy("Enemy3", 30, 5, new Vector2(660, 200)));
-                foreach (var e in enemies) e.Sprite = pixel;
 
-                System.Diagnostics.Debug.WriteLine("New Wave " + currentWave);
-            }
+
         }
-
 
         else if (currentState == BattleState.EnemyTurn)
         {
-            foreach (var enemy in enemies)
+            enemyTurnTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            if (enemyTurnTimer > 1.0f)
             {
-                enemy.TakeTurn(allies, enemies);
+                if (enemyIndex < enemies.Count)
+                {
+                    enemies[enemyIndex].TakeTurn(allies, enemies);
+                    enemyIndex++;
+                    enemyTurnTimer = 0f;
+                }
+                else
+                {
+                    currentState = BattleState.PlayerTurn;
+                    activeunitindex = 0;
+                    enemyIndex = 0;
+                    enemyTurnTimer = 0f;
+
+
+                }
             }
-            currentState = BattleState.PlayerTurn;
-            activeunitindex = 0;
         }
+
+        for (int i = allies.Count - 1; i >= 0; i--)
+        {
+            if (allies[i].CurrentHP <= 0)
+            {
+                allies.RemoveAt(i);
+                System.Diagnostics.Debug.WriteLine("Bir müttefik elendi!");
+            }
+        }
+
+        if (allies.Count == 0)
+        {
+            System.Diagnostics.Debug.WriteLine("GAME OVER!");
+            currentState = BattleState.GameOver;
+        }
+
+        if (enemies.Count == 0 && currentWave == 4)
+        {
+            currentState = BattleState.Victory;
+        }
+
+
+
+
 
 
 
@@ -203,20 +272,25 @@ public class Game1 : Game
 
     private void DrawHealthBar(Vector2 position, int currentHP, int maxHP)
     {
-        _spriteBatch.Draw(pixel, new Rectangle((int)position.X, (int)position.Y - 15, 50, 5), Color.Red);
+        _spriteBatch.Draw(pixel, new Rectangle((int)position.X, (int)position.Y - 20, 50, 6), Color.Red);
 
         float healthPercent = (float)currentHP / maxHP;
-        _spriteBatch.Draw(pixel, new Rectangle((int)position.X, (int)position.Y - 15, (int)(50 * healthPercent), 5), Color.Green);
+        _spriteBatch.Draw(pixel, new Rectangle((int)position.X, (int)position.Y - 20, (int)(50 * healthPercent), 6), Color.Green);
+
+        string hpText = $"{currentHP}/{maxHP}";
+        _spriteBatch.DrawString(gameFont, hpText, new Vector2(position.X, position.Y - 35), Color.White, 0, Vector2.Zero, 0.5f, SpriteEffects.None, 0);
     }
 
     private void DrawManaBar(Vector2 position, int currentMP, int maxMP)
     {
-        _spriteBatch.Draw(pixel, new Rectangle((int)position.X, (int)position.Y - 8, 50, 4), Color.Black * 0.5f);
+        _spriteBatch.Draw(pixel, new Rectangle((int)position.X, (int)position.Y - 12, 50, 4), Color.Black * 0.5f);
 
         float manaPercent = (float)currentMP / maxMP;
-        _spriteBatch.Draw(pixel, new Rectangle((int)position.X, (int)position.Y - 8, (int)(50 * manaPercent), 4), Color.DeepSkyBlue);
-    }
+        _spriteBatch.Draw(pixel, new Rectangle((int)position.X, (int)position.Y - 12, (int)(50 * manaPercent), 4), Color.DeepSkyBlue);
 
+        string mpText = $"{currentMP}/{maxMP}";
+        _spriteBatch.DrawString(gameFont, mpText, new Vector2(position.X + 55, position.Y - 15), Color.Cyan, 0, Vector2.Zero, 0.6f, SpriteEffects.None, 0);
+    }
     protected override void Draw(GameTime gameTime)
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);

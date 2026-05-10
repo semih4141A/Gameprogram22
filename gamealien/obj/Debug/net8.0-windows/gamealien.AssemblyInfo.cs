@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("gamealien")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d95440567b4ff7f4fe5b5d3a522f77c0a8097c87")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d707afc2b7ea859808af31d51f1ea16686bd3cd8")]
 [assembly: System.Reflection.AssemblyProductAttribute("gamealien")]
 [assembly: System.Reflection.AssemblyTitleAttribute("gamealien")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
