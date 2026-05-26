@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 public class Player : BaseCharacter
 {
@@ -30,6 +31,7 @@ public class Player : BaseCharacter
 
 
 
+
     public class Leroy : Player
     {
 
@@ -42,6 +44,10 @@ public class Player : BaseCharacter
 
         }
 
+
+
+
+
         public override bool ExecuteSkill(int skillIndex, List<Player> allies, List<Enemy> enemies, int targetIndex, bool isultimateunlocked)
         {
             int skill1manacost = 0;
@@ -53,6 +59,7 @@ public class Player : BaseCharacter
             {
                 if (CurrentMP >= skill1manacost)
                 {
+                    this.CurrentState = CharacterState.Attack;
                     CurrentMP -= skill1manacost;
                     GainMP(10);
                     enemies[targetIndex].TakeDamage(Attackpower);
@@ -61,10 +68,11 @@ public class Player : BaseCharacter
                     return true;
                 }
             }
-            else if (skillIndex == 1)//Double Trouble
+            else if (skillIndex == 1)
             {
                 if (CurrentMP >= skill2manacost)
                 {
+                    this.CurrentState = CharacterState.Attack;
                     DoubleTroubleActive = true;
                     CurrentMP -= skill2manacost;
                     enemies[targetIndex].TakeDamage(Attackpower * 2);
@@ -74,11 +82,12 @@ public class Player : BaseCharacter
                 }
             }
 
-            else if (skillIndex == 2)//Sword Rain
+            else if (skillIndex == 2)
             {
 
                 if (CurrentMP >= skill3manacost)
                 {
+                    this.CurrentState = CharacterState.Attack;
                     foreach (var e in enemies) e.TakeDamage(Attackpower);
                     CurrentMP -= skill3manacost;
                     System.Console.WriteLine($"{Name} uses Sword Rain, hitting all enemies for {Attackpower} damage!");
@@ -88,10 +97,11 @@ public class Player : BaseCharacter
                 }
             }
 
-            else if (skillIndex == 3 && isultimateunlocked)//Guardian Stance
+            else if (skillIndex == 3 && isultimateunlocked)
             {
                 if (CurrentMP >= skill4manacost)
                 {
+                    this.CurrentState = CharacterState.Defend;
                     IsGuarding = true;
                     CurrentMP -= skill4manacost;
                     System.Console.WriteLine($"{Name} enters Guardian Stance!");
@@ -111,6 +121,10 @@ public class Player : BaseCharacter
             if (DoubleTroubleActive) damage *= 2;
             if (IsGuarding) damage /= 4;
             base.TakeDamage(damage);
+            if (CurrentHP > 0)
+                CurrentState = CharacterState.Hurt;
+            else
+                CurrentState = CharacterState.Dead;
             DoubleTroubleActive = false; IsGuarding = false;
         }
     }
@@ -133,6 +147,7 @@ public class Player : BaseCharacter
                 if (CurrentMP >= skill1manacost)
                 {
 
+
                     CurrentMP -= skill1manacost;
                     GainMP(10);
                     enemies[targetIndex].TakeDamage(Attackpower);
@@ -141,7 +156,7 @@ public class Player : BaseCharacter
                     return true;
                 }
             }
-            else if (skillIndex == 1)//Heal 
+            else if (skillIndex == 1)
             {
                 if (CurrentMP >= skill2manacost)
                 {
@@ -154,7 +169,7 @@ public class Player : BaseCharacter
 
 
 
-            else if (skillIndex == 2)// powerup
+            else if (skillIndex == 2)
             {
                 if (CurrentMP >= skill3manacost)
                 {
@@ -169,7 +184,7 @@ public class Player : BaseCharacter
                 }
             }
 
-            else if (skillIndex == 3 && isultimateunlocked)// Ulti Final sacrfice
+            else if (skillIndex == 3 && isultimateunlocked)
             {
                 if (CurrentMP >= skill4manacost)
                 {
@@ -257,7 +272,7 @@ public class Player : BaseCharacter
                     foreach (var e in enemies) e.TakeDamage(totalDamage);
                     CurrentMP = 0;
                     this.Attackpower = this.BaseAttackPower;
-                    System.Console.WriteLine($"{Name} uses Ultimate Sacrifice, dealing {totalDamage} damage to all enemies!");
+                    System.Console.WriteLine($"{Name} uses Ultimate , dealing {totalDamage} damage to all enemies!");
                     return true;
                 }
             }

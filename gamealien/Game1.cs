@@ -65,8 +65,30 @@ public class Game1 : Game
         pixel = new Texture2D(GraphicsDevice, 1, 1);
         pixel.SetData(new[] { Color.White });
 
+        var leroy = allies.Find(a => a.Name == "Leroy");
+        if (leroy != null)
+        {
 
-        foreach (var a in allies) a.Sprite = pixel;
+            leroy.spriteIdle = Content.Load<Texture2D>("Characters/Leroy/Idle");
+            leroy.spriteAttack = Content.Load<Texture2D>("Characters/Leroy/Attack 1");
+            leroy.spriteDefend = Content.Load<Texture2D>("Characters/Leroy/Defend");
+            leroy.spriteHurt = Content.Load<Texture2D>("Characters/Leroy/Hurt");
+            leroy.spriteDead = Content.Load<Texture2D>("Characters/Leroy/Dead");
+        }
+
+
+        foreach (var a in allies)
+        {
+            if (a.Name != "Leroy")
+            {
+                a.spriteIdle = pixel;
+                a.spriteAttack = pixel;
+                a.spriteDefend = pixel;
+                a.spriteHurt = pixel;
+                a.spriteDead = pixel;
+            }
+        }
+
         foreach (var e in enemies) e.Sprite = pixel;
 
 
@@ -75,6 +97,16 @@ public class Game1 : Game
     protected override void Update(GameTime gameTime)
     {
         var kstate = Keyboard.GetState();
+
+        foreach (var ally in allies)
+        {
+            ally.UpdateAnimation(gameTime);
+        }
+
+        foreach (var enemy in enemies)
+        {
+            enemy.UpdateAnimation(gameTime);
+        }
 
         if (currentState == BattleState.GameOver || currentState == BattleState.Victory)
         {
@@ -183,6 +215,12 @@ public class Game1 : Game
                             }
 
                             isskillselected = false;
+
+                            if (allies[activeunitindex].CurrentState != BaseCharacter.CharacterState.Dead)
+                            {
+
+                            }
+
                             activeunitindex++;
 
                             if (activeunitindex >= allies.Count)
@@ -244,10 +282,16 @@ public class Game1 : Game
         {
             if (allies[i].CurrentHP <= 0)
             {
-                allies.RemoveAt(i);
+                allies[i].CurrentState = BaseCharacter.CharacterState.Dead;
                 System.Diagnostics.Debug.WriteLine("Bir müttefik elendi!");
             }
         }
+
+        allies.RemoveAll(ally => ally.CurrentState == BaseCharacter.CharacterState.Dead &&
+                         ally.currentFrame == 5);
+
+        enemies.RemoveAll(enemy => enemy.CurrentState == BaseCharacter.CharacterState.Dead &&
+                                   enemy.currentFrame == 5);
 
         if (allies.Count == 0)
         {

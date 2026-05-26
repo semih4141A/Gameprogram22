@@ -82,3 +82,15 @@ c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\obj\D
 c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\obj\Debug\net8.0-windows\gamealien.genruntimeconfig.cache
 c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\obj\Debug\net8.0-windows\ref\gamealien.dll
 c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Gamefont.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Leroy\Attack 1.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Leroy\Attack 2.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Leroy\Attack 3.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Leroy\Dead.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Leroy\Defend.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Leroy\Hurt.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Leroy\Idle.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Leroy\Jump.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Leroy\Protect.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Leroy\Run+Attack.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Leroy\Run.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Leroy\Walk.xnb
