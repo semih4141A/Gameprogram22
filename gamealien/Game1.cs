@@ -46,9 +46,9 @@ public class Game1 : Game
 
     protected override void Initialize()
     {
-        allies.Add(new Player.Leroy("Leroy", 100, 50, 20, new Vector2(300, 200)));
-        allies.Add(new Player.Renato("Renato", 60, 50, 15, new Vector2(200, 200)));
-        allies.Add(new Player.Yaser("Yaser", 70, 50, 20, new Vector2(100, 200)));
+        allies.Add(new Player.Leroy("Leroy", 100, 50, 20, new Vector2(300, 215)));
+        allies.Add(new Player.Renato("Renato", 60, 50, 15, new Vector2(150, 215)));
+        allies.Add(new Player.Yaser("Yaser", 70, 50, 20, new Vector2(0, 160)));
 
         enemies.Add(new Vampire("Vampire", 60, 12, new Vector2(500, 200)));
         enemies.Add(new Skeleton("Skeleton", 40, 15, new Vector2(580, 200)));
@@ -76,17 +76,39 @@ public class Game1 : Game
             leroy.spriteDead = Content.Load<Texture2D>("Characters/Leroy/Dead");
         }
 
-
-        foreach (var a in allies)
+        var renato = allies.Find(a => a.Name == "Renato");
+        if (renato != null)
         {
-            if (a.Name != "Leroy")
-            {
-                a.spriteIdle = pixel;
-                a.spriteAttack = pixel;
-                a.spriteDefend = pixel;
-                a.spriteHurt = pixel;
-                a.spriteDead = pixel;
-            }
+            renato.spriteIdle = Content.Load<Texture2D>("Characters/Renato/Idle");
+            renato.spriteAttack = Content.Load<Texture2D>("Characters/Renato/Attacks");
+            renato.spriteHurt = Content.Load<Texture2D>("Characters/Renato/Hurt");
+            renato.spriteDead = Content.Load<Texture2D>("Characters/Renato/Death");
+            renato.spriteCrouchAttack = Content.Load<Texture2D>("Characters/Renato/crouch_attacks");
+            renato.spriteHeal = Content.Load<Texture2D>("Characters/Renato/Heal");
+            renato.spritePowerup = Content.Load<Texture2D>("Characters/Renato/PowerUp");
+        }
+
+        renato.idleColumns = 2; renato.idleRows = 4;
+        renato.attackColumns = 8; renato.attackRows = 5;
+        renato.hurtColumns = 2; renato.hurtRows = 2;
+        renato.deadColumns = 2; renato.deadRows = 3;
+        renato.ultColumns = 2; renato.ultRows = 4;
+
+        renato.frameCountIdle = renato.idleColumns * renato.idleRows;
+        renato.frameCountAttack = renato.attackColumns * renato.attackRows;
+        renato.frameCountHurt = renato.hurtColumns * renato.hurtRows;
+        renato.frameCountDead = renato.deadColumns * renato.deadRows;
+        renato.frameCountUlt = renato.ultColumns * renato.ultRows;
+
+        var yaser = allies.Find(a => a.Name == "Yaser");
+        if (yaser != null)
+        {
+            yaser.spriteYaserIdle = Content.Load<Texture2D>("Characters/Yaser/Idle");
+            yaser.spriteYaserAttack = Content.Load<Texture2D>("Characters/Yaser/Attack");
+            yaser.spriteYaserHurt = Content.Load<Texture2D>("Characters/Yaser/Hurt");
+            yaser.spriteYaserDead = Content.Load<Texture2D>("Characters/Yaser/Death");
+            yaser.spriteYaserUlt = Content.Load<Texture2D>("Characters/Yaser/UltimateAttack");
+
         }
 
         foreach (var e in enemies) e.Sprite = pixel;
@@ -216,16 +238,13 @@ public class Game1 : Game
 
                             isskillselected = false;
 
-                            if (allies[activeunitindex].CurrentState != BaseCharacter.CharacterState.Dead)
-                            {
 
-                            }
 
                             activeunitindex++;
 
-                            if (activeunitindex >= allies.Count)
-                            {
 
+                            if (activeunitindex >= allies.Count || allies.Count == 0)
+                            {
                                 currentState = BattleState.EnemyTurn;
                                 activeunitindex = 0;
                                 enemyIndex = 0;
@@ -277,26 +296,79 @@ public class Game1 : Game
                 }
             }
         }
-
         for (int i = allies.Count - 1; i >= 0; i--)
         {
             if (allies[i].CurrentHP <= 0)
             {
-                allies[i].CurrentState = BaseCharacter.CharacterState.Dead;
-                System.Diagnostics.Debug.WriteLine("Bir müttefik elendi!");
+                if (allies[i].CurrentState != BaseCharacter.CharacterState.Dead)
+                {
+                    allies[i].CurrentState = BaseCharacter.CharacterState.Dead;
+                    allies[i].currentFrame = 0;
+                    System.Diagnostics.Debug.WriteLine($"{allies[i].Name} elendi, ölüm animasyonu tetiklendi.");
+                }
+
+
+
             }
         }
 
-        allies.RemoveAll(ally => ally.CurrentState == BaseCharacter.CharacterState.Dead &&
-                         ally.currentFrame == 5);
-
-        enemies.RemoveAll(enemy => enemy.CurrentState == BaseCharacter.CharacterState.Dead &&
-                                   enemy.currentFrame == 5);
-
-        if (allies.Count == 0)
+        for (int i = enemies.Count - 1; i >= 0; i--)
         {
-            System.Diagnostics.Debug.WriteLine("GAME OVER!");
-            currentState = BattleState.GameOver;
+            if (enemies[i].CurrentHP <= 0)
+            {
+                if (enemies[i].CurrentState != BaseCharacter.CharacterState.Dead)
+                {
+                    enemies[i].CurrentState = BaseCharacter.CharacterState.Dead;
+                    enemies[i].currentFrame = 0;
+                }
+
+                if (gameTime.TotalGameTime.Ticks % 6 == 0)
+                {
+                    enemies[i].currentFrame++;
+                }
+            }
+        }
+
+        allies.RemoveAll(ally =>
+            (ally.Name == "Yaser" && ally.CurrentState == BaseCharacter.CharacterState.Dead && ally.currentFrame >= 6) ||
+            (ally.Name == "Renato" && ally.CurrentState == BaseCharacter.CharacterState.Dead && ally.currentFrame >= 3) ||
+            (ally.Name == "Leroy" && ally.CurrentState == BaseCharacter.CharacterState.Dead && ally.currentFrame >= 5)
+        );
+        enemies.RemoveAll(enemy => enemy.CurrentState == BaseCharacter.CharacterState.Dead && enemy.currentFrame >= 5);
+
+
+        if (currentState == BattleState.PlayerTurn)
+        {
+            if (activeunitindex < allies.Count && allies[activeunitindex].CurrentHP <= 0)
+            {
+                activeunitindex++;
+            }
+
+            bool anyRealAllyAlive = false;
+            foreach (var ally in allies)
+            {
+                if (ally.CurrentHP > 0) anyRealAllyAlive = true;
+            }
+
+            if (activeunitindex >= allies.Count || !anyRealAllyAlive || allies.Count == 0)
+            {
+                if (anyRealAllyAlive && allies.Count > 0)
+                {
+                    currentState = BattleState.EnemyTurn;
+                    activeunitindex = 0;
+                    enemyIndex = 0;
+                    enemyTurnTimer = 0f;
+                    System.Diagnostics.Debug.WriteLine("Oyuncu turu bitti. SIRA DÜŞMANDA!");
+                }
+                else
+                {
+                    currentState = BattleState.GameOver;
+                    System.Diagnostics.Debug.WriteLine("Tüm müttefikler öldü! GAME OVER!");
+                }
+            }
+
+            if (activeunitindex >= allies.Count && allies.Count > 0) activeunitindex = allies.Count - 1;
+            if (activeunitindex < 0) activeunitindex = 0;
         }
 
         if (enemies.Count == 0 && currentWave == 4)
@@ -304,36 +376,36 @@ public class Game1 : Game
             currentState = BattleState.Victory;
         }
 
-
-
-
-
-
-
         oldState = kstate;
         base.Update(gameTime);
     }
 
     private void DrawHealthBar(Vector2 position, int currentHP, int maxHP)
     {
-        _spriteBatch.Draw(pixel, new Rectangle((int)position.X, (int)position.Y - 20, 50, 6), Color.Red);
+        int bX = (int)position.X;
+        int bY = (int)position.Y;
+
+        _spriteBatch.Draw(pixel, new Rectangle(bX, bY, 50, 6), Color.Red);
 
         float healthPercent = (float)currentHP / maxHP;
-        _spriteBatch.Draw(pixel, new Rectangle((int)position.X, (int)position.Y - 20, (int)(50 * healthPercent), 6), Color.Green);
+        _spriteBatch.Draw(pixel, new Rectangle(bX, bY, (int)(50 * healthPercent), 6), Color.Green);
 
         string hpText = $"{currentHP}/{maxHP}";
-        _spriteBatch.DrawString(gameFont, hpText, new Vector2(position.X, position.Y - 35), Color.White, 0, Vector2.Zero, 0.5f, SpriteEffects.None, 0);
+        _spriteBatch.DrawString(gameFont, hpText, new Vector2(bX + 55, bY), Color.White, 0, Vector2.Zero, 0.5f, SpriteEffects.None, 0);
     }
 
     private void DrawManaBar(Vector2 position, int currentMP, int maxMP)
     {
-        _spriteBatch.Draw(pixel, new Rectangle((int)position.X, (int)position.Y - 12, 50, 4), Color.Black * 0.5f);
+        int bX = (int)position.X;
+        int bY = (int)position.Y + 10;
+
+        _spriteBatch.Draw(pixel, new Rectangle(bX, bY, 50, 4), Color.Black * 0.5f);
 
         float manaPercent = (float)currentMP / maxMP;
-        _spriteBatch.Draw(pixel, new Rectangle((int)position.X, (int)position.Y - 12, (int)(50 * manaPercent), 4), Color.DeepSkyBlue);
+        _spriteBatch.Draw(pixel, new Rectangle(bX, bY, (int)(50 * manaPercent), 4), Color.DeepSkyBlue);
 
         string mpText = $"{currentMP}/{maxMP}";
-        _spriteBatch.DrawString(gameFont, mpText, new Vector2(position.X + 55, position.Y - 15), Color.Cyan, 0, Vector2.Zero, 0.6f, SpriteEffects.None, 0);
+        _spriteBatch.DrawString(gameFont, mpText, new Vector2(bX + 55, bY - 4), Color.Cyan, 0, Vector2.Zero, 0.6f, SpriteEffects.None, 0);
     }
     protected override void Draw(GameTime gameTime)
     {
@@ -348,9 +420,25 @@ public class Game1 : Game
             bool isTargeted = (isskillselected && isHealing && selectedtargetind == i);
 
             Color c = isTargeted ? Color.Yellow : (i == activeunitindex ? Color.Green : Color.Blue);
+
             allies[i].Draw(_spriteBatch, c, gameFont);
-            DrawHealthBar(allies[i].Position, allies[i].CurrentHP, allies[i].MaxHP);
-            DrawManaBar(allies[i].Position, allies[i].CurrentMP, allies[i].MaxMP);
+
+            int barX = 0;
+            int barY = 200;
+
+            if (allies[i].Name == "Yaser") barX = 75;
+            if (allies[i].Name == "Renato") barX = 210;
+            if (allies[i].Name == "Leroy") barX = 315;
+
+            Vector2 uiPos = new Vector2(barX, barY);
+
+            string name = allies[i].Name;
+            Vector2 nameSize = gameFont.MeasureString(name);
+            Vector2 namePos = new Vector2(uiPos.X + (50 / 2) - (nameSize.X / 2), uiPos.Y - 20);
+            _spriteBatch.DrawString(gameFont, name, namePos, Color.White);
+
+            DrawHealthBar(uiPos, allies[i].CurrentHP, allies[i].MaxHP);
+            DrawManaBar(uiPos, allies[i].CurrentMP, allies[i].MaxMP);
         }
 
         for (int i = 0; i < enemies.Count; i++)
@@ -361,37 +449,70 @@ public class Game1 : Game
             bool isTargeted = (isskillselected && !isHealing && selectedtargetind == i);
 
             Color c = isTargeted ? Color.Yellow : Color.Red;
+
             enemies[i].Draw(_spriteBatch, c, gameFont);
-            DrawHealthBar(enemies[i].Position, enemies[i].CurrentHP, enemies[i].MaxHP);
+
+            int enemyUiX = 500 + (i * 80);
+            int enemyUiY = 140;
+
+            string enemyName = enemies[i].Name;
+            Vector2 enemyNameSize = gameFont.MeasureString(enemyName);
+            Vector2 enemyNamePos = new Vector2(enemyUiX + (50 / 2) - (enemyNameSize.X / 2), enemyUiY - 20);
+            _spriteBatch.DrawString(gameFont, enemyName, enemyNamePos, Color.White);
+
+            DrawHealthBar(new Vector2(enemyUiX, enemyUiY + 25), enemies[i].CurrentHP, enemies[i].MaxHP);
         }
 
         if (currentState == BattleState.PlayerTurn)
         {
+            if (activeunitindex < 0 || activeunitindex >= allies.Count)
+            {
+                _spriteBatch.End();
+                return;
+            }
             Vector2 pPos = allies[activeunitindex].Position;
 
             for (int i = 0; i < 4; i++)
             {
                 Color boxColor = (selectedskillind == i) ? Color.Gold : Color.Gray * 0.6f;
 
-                Rectangle skillBox = new Rectangle((int)pPos.X, (int)pPos.Y - 180 + (i * 40), 50, 30);
+                int offsetX = 0;
+                int offsetY = -180;
+
+                if (activeunitindex == 2)
+                {
+                    offsetX = 20;
+                }
+                else if (activeunitindex == 1)
+                {
+                    offsetX = 60;
+                }
+                else if (activeunitindex == 0)
+                {
+                    offsetX = 10;
+                }
+
+                Rectangle skillBox = new Rectangle((int)pPos.X + offsetX, (int)pPos.Y + offsetY + (i * 40), 50, 30);
 
                 _spriteBatch.Draw(pixel, skillBox, boxColor);
             }
 
-
             if (isskillselected)
             {
-
                 bool isFriendlyTarget = (activeunitindex == 1 && (selectedskillind == 1 || selectedskillind == 2)) ||
                                         (activeunitindex == 2 && selectedskillind == 2);
 
-                Vector2 targetPos;
-                if (isFriendlyTarget)
-                    targetPos = allies[selectedtargetind].Position;
-                else
-                    targetPos = enemies[selectedtargetind].Position;
 
-                _spriteBatch.Draw(pixel, new Rectangle((int)targetPos.X, (int)targetPos.Y + 100, 40, 10), Color.Yellow);
+                if (isFriendlyTarget && selectedtargetind < allies.Count && selectedtargetind >= 0)
+                {
+                    Vector2 targetPos = allies[selectedtargetind].Position;
+                    _spriteBatch.Draw(pixel, new Rectangle((int)targetPos.X, (int)targetPos.Y + 100, 40, 10), Color.Yellow);
+                }
+                else if (!isFriendlyTarget && selectedtargetind < enemies.Count && selectedtargetind >= 0)
+                {
+                    Vector2 targetPos = enemies[selectedtargetind].Position;
+                    _spriteBatch.Draw(pixel, new Rectangle((int)targetPos.X, (int)targetPos.Y + 100, 40, 10), Color.Yellow);
+                }
             }
         }
 

@@ -9,6 +9,12 @@ public class Enemy : BaseCharacter
 
     public void TakeTurn(List<Player> allies, List<Enemy> enemies)
     {
+
+        if (allies == null || allies.Count == 0)
+        {
+            System.Diagnostics.Debug.WriteLine("Saldıracak oyuncu kalmadı, yapay zeka turn atlıyor.");
+            return;
+        }
         System.Random rnd = new System.Random();
 
         int targetIndex = rnd.Next(0, allies.Count);

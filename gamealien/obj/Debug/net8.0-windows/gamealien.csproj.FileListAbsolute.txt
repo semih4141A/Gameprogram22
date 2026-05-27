@@ -94,3 +94,15 @@ c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\D
 c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Leroy\Run+Attack.xnb
 c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Leroy\Run.xnb
 c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Leroy\Walk.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Renato\Attacks.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Renato\crouch_attacks.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Renato\Death.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Renato\Heal.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Renato\Hurt.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Renato\Idle.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Renato\Powerup.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Yaser\Attack.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Yaser\Death.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Yaser\Hurt.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Yaser\Idle.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Yaser\UltimateAttack.xnb

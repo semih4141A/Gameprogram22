@@ -146,6 +146,7 @@ public class Player : BaseCharacter
             {
                 if (CurrentMP >= skill1manacost)
                 {
+                    this.CurrentState = CharacterState.Attack;
 
 
                     CurrentMP -= skill1manacost;
@@ -160,6 +161,9 @@ public class Player : BaseCharacter
             {
                 if (CurrentMP >= skill2manacost)
                 {
+                    this.CurrentState = CharacterState.Heal;
+                    this.currentFrame = 0;
+                    this.animationTimer = 0f;
                     CurrentMP -= skill2manacost;
                     allies[targetIndex].Heal(30);
                     System.Console.WriteLine($"{allies[targetIndex].Name} is healed by {Name}!");
@@ -173,6 +177,9 @@ public class Player : BaseCharacter
             {
                 if (CurrentMP >= skill3manacost)
                 {
+                    this.CurrentState = CharacterState.Powerup;
+                    currentFrame = 0;
+                    animationTimer = 0f;
                     CurrentMP -= skill3manacost;
                     foreach (var a in allies)
                     {
@@ -186,16 +193,30 @@ public class Player : BaseCharacter
 
             else if (skillIndex == 3 && isultimateunlocked)
             {
+
+
                 if (CurrentMP >= skill4manacost)
                 {
                     CurrentMP -= skill4manacost;
 
-                    enemies[targetIndex].CurrentHP = 0;
-                    this.CurrentHP = 0;
+                    System.Threading.Tasks.Task.Run(async () =>
+                    {
+                        this.CurrentState = CharacterState.Ult;
 
+                        enemies[targetIndex].TakeDamage(enemies[targetIndex].CurrentHP);
+
+                        await System.Threading.Tasks.Task.Delay(800);
+
+                        this.CurrentHP = 0;
+                        this.CurrentState = CharacterState.Dead;
+
+                        await System.Threading.Tasks.Task.Delay(900);
+
+                    });
 
                     return true;
                 }
+
             }
             return false;
         }
@@ -220,6 +241,10 @@ public class Player : BaseCharacter
             {
                 if (CurrentMP >= skill1manacost)
                 {
+                    CurrentState = CharacterState.Attack;
+                    currentFrame = 0;
+                    animationTimer = 0f;
+
                     CurrentMP -= skill1manacost;
                     GainMP(10);
                     enemies[targetIndex].TakeDamage(Attackpower);
@@ -232,6 +257,10 @@ public class Player : BaseCharacter
             {
                 if (CurrentMP >= skill2manacost)
                 {
+                    this.CurrentState = CharacterState.Attack;
+                    this.currentFrame = 0;
+                    this.animationTimer = 0f;
+
                     CurrentMP -= skill2manacost;
                     int enemyCount = enemies.Count;
                     if (enemyCount > 0)
@@ -242,31 +271,32 @@ public class Player : BaseCharacter
                     }
                     System.Console.WriteLine($"{Name} uses Chain Lightning, dealing 30 damage divided among all enemies!");
                     return true;
-
                 }
-
-
-
             }
-
             else if (skillIndex == 2)
             {
-
                 if (CurrentMP >= skill3manacost)
                 {
+                    this.CurrentState = CharacterState.Attack;
+                    this.currentFrame = 0;
+                    this.animationTimer = 0f;
+
                     CurrentMP -= skill3manacost;
                     allies[targetIndex].CurrentMP += 30;
                     if (allies[targetIndex].CurrentMP > allies[targetIndex].MaxMP)
                         allies[targetIndex].CurrentMP = allies[targetIndex].MaxMP;
 
+                    System.Console.WriteLine($"{Name}, {allies[targetIndex].Name} kişisine 30 Mana bastı!");
                     return true;
                 }
             }
-
             else if (skillIndex == 3 && isultimateunlocked)
             {
                 if (CurrentMP >= skill4manacost)
                 {
+                    CurrentState = CharacterState.Ult;
+                    currentFrame = 0;
+                    animationTimer = 0f;
 
                     int totalDamage = CurrentMP;
                     foreach (var e in enemies) e.TakeDamage(totalDamage);
@@ -280,7 +310,6 @@ public class Player : BaseCharacter
             return false;
         }
     }
-
 
 
 

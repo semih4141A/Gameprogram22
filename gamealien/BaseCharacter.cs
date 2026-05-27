@@ -14,11 +14,35 @@ public class BaseCharacter
     public float animationTimer = 0f;
     public int currentFrame = 0;
     public float FrameTime { get; set; } = 0.15f;
+
+    public int frameCountIdle = 4;
+    public int frameCountAttack = 5;
+    public int frameCountDefend = 5;
+    public int frameCountHurt = 2;
+    public int frameCountDead = 6;
+    public int frameCountUlt = 5;
+
+    public int idleColumns = 2, idleRows = 4;
+    public int attackColumns = 8, attackRows = 5;
+    public int defendColumns = 5, defendRows = 1;
+    public int hurtColumns = 2, hurtRows = 2;
+    public int deadColumns = 2, deadRows = 3;
+    public int ultColumns = 2, ultRows = 4;
     public Texture2D spriteIdle;
     public Texture2D spriteAttack;
     public Texture2D spriteDefend;
     public Texture2D spriteHurt;
     public Texture2D spriteDead;
+
+    public Texture2D spriteCrouchAttack;
+    public Texture2D spriteHeal;
+    public Texture2D spritePowerup;
+
+    public Texture2D spriteYaserIdle;
+    public Texture2D spriteYaserAttack;
+    public Texture2D spriteYaserHurt;
+    public Texture2D spriteYaserDead;
+    public Texture2D spriteYaserUlt;
 
     public BaseCharacter(string name, int hp, int atk, Vector2 pos)
     {
@@ -35,7 +59,11 @@ public class BaseCharacter
         Attack,
         Defend,
         Hurt,
-        Dead
+        Dead,
+
+        Ult,
+        Heal,
+        Powerup
     }
 
     private CharacterState currentState = CharacterState.Idle;
@@ -57,22 +85,64 @@ public class BaseCharacter
     {
         Texture2D currentTexture = spriteIdle;
 
-        switch (CurrentState)
+        if (Name == "Yaser")
         {
-            case CharacterState.Idle: currentTexture = spriteIdle; break;
-            case CharacterState.Attack: currentTexture = spriteAttack; break;
-            case CharacterState.Defend: currentTexture = spriteDefend; break;
-            case CharacterState.Hurt: currentTexture = spriteHurt; break;
-            case CharacterState.Dead: currentTexture = spriteDead; break;
+            switch (CurrentState)
+            {
+                case CharacterState.Idle: currentTexture = spriteYaserIdle; break;
+                case CharacterState.Attack: currentTexture = spriteYaserAttack; break;
+                case CharacterState.Hurt: currentTexture = spriteYaserHurt; break;
+                case CharacterState.Dead: currentTexture = spriteYaserDead; break;
+                case CharacterState.Ult: currentTexture = spriteYaserUlt; break;
+                default: currentTexture = spriteYaserIdle; break;
+            }
+        }
+        else
+        {
+            switch (CurrentState)
+            {
+                case CharacterState.Idle: currentTexture = spriteIdle; break;
+                case CharacterState.Attack: currentTexture = spriteAttack; break;
+                case CharacterState.Defend: currentTexture = spriteDefend; break;
+                case CharacterState.Hurt: currentTexture = spriteHurt; break;
+                case CharacterState.Dead: currentTexture = spriteDead; break;
+                case CharacterState.Ult: currentTexture = spriteCrouchAttack; break;
+                case CharacterState.Heal: currentTexture = spriteHeal; break;
+                case CharacterState.Powerup: currentTexture = spritePowerup; break;
+            }
         }
 
         if (currentTexture != null)
         {
             int frameCount = 4;
-            if (CurrentState == CharacterState.Attack) frameCount = 5;
-            else if (CurrentState == CharacterState.Defend) frameCount = 5;
-            else if (CurrentState == CharacterState.Dead) frameCount = 6;
-            else if (CurrentState == CharacterState.Hurt) frameCount = 2;
+            switch (CurrentState)
+            {
+                case CharacterState.Idle: frameCount = frameCountIdle; break;
+                case CharacterState.Attack: frameCount = frameCountAttack; break;
+                case CharacterState.Defend: frameCount = frameCountDefend; break;
+                case CharacterState.Hurt: frameCount = frameCountHurt; break;
+                case CharacterState.Dead: frameCount = frameCountDead; break;
+                case CharacterState.Ult: frameCount = frameCountUlt; break;
+                case CharacterState.Heal: frameCount = 12; break;
+                case CharacterState.Powerup: frameCount = 7; break;
+            }
+
+            if (Name == "Yaser")
+            {
+                switch (CurrentState)
+                {
+                    case CharacterState.Idle: frameCount = 6; break;
+                    case CharacterState.Attack: frameCount = 8; break;
+                    case CharacterState.Hurt: frameCount = 4; break;
+                    case CharacterState.Dead: frameCount = 7; break;
+                    case CharacterState.Ult: frameCount = 8; break;
+                }
+            }
+
+            if (Name == "Renato" && CurrentState == CharacterState.Attack)
+            {
+                frameCount = 8;
+            }
 
             animationTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
 
@@ -81,130 +151,192 @@ public class BaseCharacter
                 animationTimer = 0f;
                 currentFrame++;
 
-                if (CurrentState == CharacterState.Hurt && currentFrame >= frameCount)
+                if (Name == "Yaser")
                 {
-                    CurrentState = CharacterState.Idle;
-                    currentFrame = 0;
-                }
-                else if (CurrentState == CharacterState.Attack && currentFrame >= frameCount)
-                {
-                    CurrentState = CharacterState.Idle;
-                    currentFrame = 0;
-                }
-                else if (CurrentState == CharacterState.Dead)
-                {
-                    if (currentFrame >= frameCount)
+                    if ((CurrentState == CharacterState.Attack || CurrentState == CharacterState.Hurt) && currentFrame >= frameCount)
                     {
-                        currentFrame = frameCount - 1;
+                        CurrentState = CharacterState.Idle;
+                        currentFrame = 0;
+                    }
+                    else if (CurrentState == CharacterState.Ult && currentFrame >= frameCount)
+                    {
+                        CurrentState = CharacterState.Idle;
+                        currentFrame = 0;
+                    }
+                    else if (CurrentState == CharacterState.Dead && currentFrame >= frameCount)
+                    {
+                        if (currentFrame >= frameCount)
+                        {
+                            currentFrame = frameCount - 1;
+                        }
                     }
                 }
+
+
+
                 else
                 {
-                    currentFrame %= frameCount;
+                    if (CurrentState == CharacterState.Heal && currentFrame >= frameCount)
+                    {
+                        CurrentState = CharacterState.Idle;
+                        currentFrame = 0;
+                    }
+                    else if (CurrentState == CharacterState.Powerup && currentFrame >= frameCount)
+                    {
+                        CurrentState = CharacterState.Idle;
+                        currentFrame = 0;
+                    }
+                    else if (CurrentState == CharacterState.Ult && currentFrame >= frameCount)
+                    {
+                        CurrentState = CharacterState.Dead;
+                        currentFrame = 0;
+                    }
+                    else if (CurrentState == CharacterState.Hurt && currentFrame >= frameCount)
+                    {
+                        CurrentState = CharacterState.Idle;
+                        currentFrame = 0;
+                    }
+                    else if (CurrentState == CharacterState.Attack && currentFrame >= frameCount)
+                    {
+                        CurrentState = CharacterState.Idle;
+                        currentFrame = 0;
+                    }
+                    else if (CurrentState == CharacterState.Dead)
+                    {
+                        if (currentFrame >= frameCount)
+                        {
+                            currentFrame = frameCount - 1;
+                        }
+                    }
+                    else
+                    {
+                        currentFrame %= frameCount;
+                    }
                 }
             }
 
-            if (currentFrame >= frameCount) currentFrame = 0;
         }
     }
-
     public virtual void Draw(SpriteBatch spriteBatch, Color characterColor, SpriteFont font)
     {
         Texture2D currentTexture = spriteIdle;
 
-        switch (CurrentState)
+        if (Name == "Yaser")
         {
-            case CharacterState.Idle: currentTexture = spriteIdle; break;
-            case CharacterState.Attack: currentTexture = spriteAttack; break;
-            case CharacterState.Defend: currentTexture = spriteDefend; break;
-            case CharacterState.Hurt: currentTexture = spriteHurt; break;
-            case CharacterState.Dead: currentTexture = spriteDead; break;
+            switch (CurrentState)
+            {
+                case CharacterState.Idle: currentTexture = spriteYaserIdle; break;
+                case CharacterState.Attack: currentTexture = spriteYaserAttack; break;
+                case CharacterState.Hurt: currentTexture = spriteYaserHurt; break;
+                case CharacterState.Dead: currentTexture = spriteYaserDead; break;
+                case CharacterState.Ult: currentTexture = spriteYaserUlt; break;
+                default: currentTexture = spriteYaserIdle; break;
+            }
+        }
+        else
+        {
+            switch (CurrentState)
+            {
+                case CharacterState.Idle: currentTexture = spriteIdle; break;
+                case CharacterState.Attack: currentTexture = spriteAttack; break;
+                case CharacterState.Defend: currentTexture = spriteDefend; break;
+                case CharacterState.Hurt: currentTexture = spriteHurt; break;
+                case CharacterState.Dead: currentTexture = spriteDead; break;
+                case CharacterState.Ult: currentTexture = spriteCrouchAttack; break;
+                case CharacterState.Heal: currentTexture = spriteHeal; break;
+                case CharacterState.Powerup: currentTexture = spritePowerup; break;
+            }
         }
 
         if (currentTexture != null)
         {
-            int frameCount = 4;
-            if (CurrentState == CharacterState.Attack) frameCount = 5;
-            else if (CurrentState == CharacterState.Defend) frameCount = 5;
-            else if (CurrentState == CharacterState.Dead) frameCount = 6;
-            else if (CurrentState == CharacterState.Hurt) frameCount = 2;
+            int columns = 4, rows = 1;
 
-            int frameWidth = currentTexture.Width / frameCount;
-            int frameHeight = currentTexture.Height;
+            if (Name == "Leroy")
+            {
+                switch (CurrentState)
+                {
+                    case CharacterState.Idle: columns = 4; rows = 1; break;
+                    case CharacterState.Attack: columns = 5; rows = 1; break;
+                    case CharacterState.Defend: columns = 5; rows = 1; break;
+                    case CharacterState.Hurt: columns = 2; rows = 1; break;
+                    case CharacterState.Dead: columns = 6; rows = 1; break;
+                }
+            }
+            else if (Name == "Renato")
+            {
+                switch (CurrentState)
+                {
+                    case CharacterState.Idle: columns = idleColumns; rows = idleRows; break;
+                    case CharacterState.Attack: columns = attackColumns; rows = attackRows; break;
+                    case CharacterState.Defend: columns = defendColumns; rows = defendRows; break;
+                    case CharacterState.Hurt: columns = hurtColumns; rows = hurtRows; break;
+                    case CharacterState.Dead: columns = 2; rows = 2; break;
+                    case CharacterState.Ult: columns = ultColumns; rows = ultRows; break;
+                    case CharacterState.Heal: columns = 4; rows = 3; break;
+                    case CharacterState.Powerup: columns = 2; rows = 4; break;
+                }
+            }
+            else if (Name == "Yaser")
+            {
+                rows = 1;
+                switch (CurrentState)
+                {
+                    case CharacterState.Idle: columns = 6; break;
+                    case CharacterState.Attack: columns = 8; break;
+                    case CharacterState.Hurt: columns = 4; break;
+                    case CharacterState.Dead: columns = 7; break;
+                    case CharacterState.Ult: columns = 8; break;
+                    default: columns = 6; break;
+                }
+            }
 
-            if (currentFrame >= frameCount) currentFrame = 0;
+            int frameWidth = currentTexture.Width / columns;
+            int frameHeight = currentTexture.Height / rows;
+
+            int totalFrames = columns * rows;
+            if (currentFrame >= totalFrames) currentFrame = 0;
+
+            int currentRow = currentFrame / columns;
+            int currentCol = currentFrame % columns;
 
             int xOffset = 0;
-
-
-            if (CurrentState == CharacterState.Idle)
+            if (Name == "Leroy" && CurrentState == CharacterState.Idle)
             {
                 switch (currentFrame)
                 {
-                    case 0: xOffset = 0; break;
                     case 1: xOffset = -4; break;
                     case 2: xOffset = -9; break;
                     case 3: xOffset = -14; break;
                 }
             }
-            else if (CurrentState == CharacterState.Attack)
-            {
-                switch (currentFrame)
-                {
-                    case 0: xOffset = 0; break;
-                    case 1: xOffset = -4; break;
-                    case 2: xOffset = -8; break;
-                    case 3: xOffset = -12; break;
-                    case 4: xOffset = -16; break;
-                }
-            }
-            else if (CurrentState == CharacterState.Defend)
-            {
-                switch (currentFrame)
-                {
-                    case 0: xOffset = 0; break;
-                    case 1: xOffset = -3; break;
-                    case 2: xOffset = -6; break;
-                    case 3: xOffset = -9; break;
-                    case 4: xOffset = -12; break;
-                }
-            }
-            else if (CurrentState == CharacterState.Hurt)
-            {
-                switch (currentFrame)
-                {
-                    case 0: xOffset = 0; break;
-                    case 1: xOffset = -4; break;
-                }
-            }
 
-            int currentX = (currentFrame * frameWidth) + xOffset;
+            int currentX = (currentCol * frameWidth) + xOffset;
+            int currentY = currentRow * frameHeight;
+
 
             if (currentX < 0) currentX = 0;
             if (currentX + frameWidth > currentTexture.Width) currentX = currentTexture.Width - frameWidth;
+            if (currentY + frameHeight > currentTexture.Height) currentY = currentTexture.Height - frameHeight;
 
-            Rectangle sourceRect = new Rectangle(currentX, 0, frameWidth, frameHeight);
+            Rectangle sourceRect = new Rectangle(currentX, currentY, frameWidth, frameHeight);
+            int finalRenderWidth = frameWidth;
+            int finalRenderHeight = frameHeight;
 
-            Rectangle destRect = new Rectangle((int)Position.X, (int)Position.Y, frameWidth, frameHeight);
-
-            spriteBatch.Draw(currentTexture, destRect, sourceRect, Color.White);
-
-            int lastFrameWidth = frameWidth;
-        }
-        else
-        {
-            if (Sprite != null)
+            if (Name == "Renato")
             {
-                spriteBatch.Draw(Sprite, new Rectangle((int)Position.X, (int)Position.Y, 50, 50), characterColor);
+                finalRenderWidth = (int)(frameWidth * 1.35f);
+                finalRenderHeight = (int)(frameHeight * 1.35f);
             }
-        }
 
-        if (font != null && !string.IsNullOrEmpty(Name))
-        {
-            int finalWidth = (currentTexture != null) ? (currentTexture.Width / (CurrentState == CharacterState.Attack || CurrentState == CharacterState.Defend ? 5 : (CurrentState == CharacterState.Dead ? 6 : (CurrentState == CharacterState.Hurt ? 2 : 4)))) : 50;
-            Vector2 nameSize = font.MeasureString(Name);
-            Vector2 textPosition = new Vector2(Position.X + (finalWidth / 2) - (nameSize.X / 2), Position.Y - 25);
-            spriteBatch.DrawString(font, Name, textPosition, Color.White);
+            else if (Name == "Yaser")
+            {
+                finalRenderWidth = frameWidth;
+                finalRenderHeight = frameHeight;
+            }
+
+            Rectangle destRect = new Rectangle((int)Position.X, (int)Position.Y, finalRenderWidth, finalRenderHeight);
+            spriteBatch.Draw(currentTexture, destRect, sourceRect, Color.White);
         }
     }
     public virtual void TakeDamage(int damage)
