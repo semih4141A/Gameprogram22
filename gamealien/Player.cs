@@ -165,7 +165,7 @@ public class Player : BaseCharacter
                     this.currentFrame = 0;
                     this.animationTimer = 0f;
                     CurrentMP -= skill2manacost;
-                    allies[targetIndex].Heal(30);
+                    allies[targetIndex].Heal(40);
                     System.Console.WriteLine($"{allies[targetIndex].Name} is healed by {Name}!");
                     return true;
                 }

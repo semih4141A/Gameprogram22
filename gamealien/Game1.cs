@@ -46,13 +46,13 @@ public class Game1 : Game
 
     protected override void Initialize()
     {
-        allies.Add(new Player.Leroy("Leroy", 100, 50, 20, new Vector2(300, 215)));
-        allies.Add(new Player.Renato("Renato", 60, 50, 15, new Vector2(150, 215)));
-        allies.Add(new Player.Yaser("Yaser", 70, 50, 20, new Vector2(0, 160)));
+        allies.Add(new Player.Leroy("Leroy", 100, 60, 20, new Vector2(300, 215)));
+        allies.Add(new Player.Renato("Renato", 70, 60, 15, new Vector2(150, 215)));
+        allies.Add(new Player.Yaser("Yaser", 70, 60, 20, new Vector2(0, 160)));
 
-        enemies.Add(new Vampire("Vampire", 60, 12, new Vector2(500, 200)));
+        enemies.Add(new Vampire("Vampire", 60, 10, new Vector2(500, 200)));
         enemies.Add(new Skeleton("Skeleton", 40, 15, new Vector2(580, 200)));
-        enemies.Add(new Vampire("Vampire", 60, 12, new Vector2(660, 200)));
+        enemies.Add(new Vampire("Vampire", 60, 10, new Vector2(660, 200)));
 
         base.Initialize();
     }
@@ -110,8 +110,9 @@ public class Game1 : Game
             yaser.spriteYaserUlt = Content.Load<Texture2D>("Characters/Yaser/UltimateAttack");
 
         }
+        Vampire.LoadSprites(this.Content);
+        System.Diagnostics.Debug.WriteLine("✅ KUTSALLIK: Vampir resimleri static olarak hafızaya alındı.");
 
-        foreach (var e in enemies) e.Sprite = pixel;
 
 
     }
@@ -155,15 +156,14 @@ public class Game1 : Game
             else if (currentWave == 3)
             {
                 enemies.Add(new Witch("Witch", 50, 20, new Vector2(500, 200)));
-                enemies.Add(new HealerGoblin("HealerGoblin", 50, 5, new Vector2(580, 200)));
+                enemies.Add(new Sorcerer("Sorcerer", 50, 5, new Vector2(580, 200)));
                 enemies.Add(new Witch("Witch", 50, 20, new Vector2(660, 200)));
             }
             else if (currentWave == 4)
             {
-                enemies.Add(new FinalBoss("FinalBoss", 300, 30, new Vector2(580, 200)));
+                enemies.Add(new FinalBoss("FinalBoss", 200, 30, new Vector2(580, 200)));
                 enemies.Add(new Witch("Witch", 50, 20, new Vector2(500, 200)));
-                enemies.Add(new HealerGoblin("HealerGoblin", 50, 5, new Vector2(660, 200)));
-
+                enemies.Add(new Sorcerer("Sorcerer", 50, 5, new Vector2(660, 200)));
             }
 
             foreach (var e in enemies) e.Sprite = pixel;
@@ -227,7 +227,11 @@ public class Game1 : Game
                             {
                                 if (enemies[i].CurrentHP <= 0)
                                 {
-                                    enemies.RemoveAt(i);
+                                    if (enemies[i].CurrentState != BaseCharacter.CharacterState.Dead)
+                                    {
+                                        enemies[i].CurrentState = BaseCharacter.CharacterState.Dead;
+                                        enemies[i].currentFrame = 0;
+                                    }
                                 }
                             }
 
@@ -281,9 +285,16 @@ public class Game1 : Game
             {
                 if (enemyIndex < enemies.Count)
                 {
-                    enemies[enemyIndex].TakeTurn(allies, enemies);
-                    enemyIndex++;
-                    enemyTurnTimer = 0f;
+                    if (enemies[enemyIndex].CurrentHP > 0 && enemies[enemyIndex].CurrentState != BaseCharacter.CharacterState.Dead)
+                    {
+                        enemies[enemyIndex].TakeTurn(allies, enemies);
+                        enemyIndex++;
+                        enemyTurnTimer = 0f;
+                    }
+                    else
+                    {
+                        enemyIndex++;
+                    }
                 }
                 else
                 {
@@ -291,8 +302,6 @@ public class Game1 : Game
                     activeunitindex = 0;
                     enemyIndex = 0;
                     enemyTurnTimer = 0f;
-
-
                 }
             }
         }
@@ -321,11 +330,6 @@ public class Game1 : Game
                     enemies[i].CurrentState = BaseCharacter.CharacterState.Dead;
                     enemies[i].currentFrame = 0;
                 }
-
-                if (gameTime.TotalGameTime.Ticks % 6 == 0)
-                {
-                    enemies[i].currentFrame++;
-                }
             }
         }
 
@@ -334,7 +338,10 @@ public class Game1 : Game
             (ally.Name == "Renato" && ally.CurrentState == BaseCharacter.CharacterState.Dead && ally.currentFrame >= 3) ||
             (ally.Name == "Leroy" && ally.CurrentState == BaseCharacter.CharacterState.Dead && ally.currentFrame >= 5)
         );
-        enemies.RemoveAll(enemy => enemy.CurrentState == BaseCharacter.CharacterState.Dead && enemy.currentFrame >= 5);
+        enemies.RemoveAll(enemy =>
+            (enemy is Vampire && enemy.CurrentState == BaseCharacter.CharacterState.Dead && enemy.currentFrame >= 7) ||
+            (!(enemy is Vampire) && enemy.CurrentState == BaseCharacter.CharacterState.Dead)
+        );
 
 
         if (currentState == BattleState.PlayerTurn)
@@ -369,6 +376,19 @@ public class Game1 : Game
 
             if (activeunitindex >= allies.Count && allies.Count > 0) activeunitindex = allies.Count - 1;
             if (activeunitindex < 0) activeunitindex = 0;
+
+            if (enemies.Count > 0)
+            {
+                if (selectedtargetind >= enemies.Count)
+                {
+                    selectedtargetind = enemies.Count - 1;
+                }
+            }
+            else
+            {
+                selectedtargetind = 0;
+            }
+            if (selectedtargetind < 0) selectedtargetind = 0;
         }
 
         if (enemies.Count == 0 && currentWave == 4)
@@ -449,7 +469,6 @@ public class Game1 : Game
             bool isTargeted = (isskillselected && !isHealing && selectedtargetind == i);
 
             Color c = isTargeted ? Color.Yellow : Color.Red;
-
             enemies[i].Draw(_spriteBatch, c, gameFont);
 
             int enemyUiX = 500 + (i * 80);

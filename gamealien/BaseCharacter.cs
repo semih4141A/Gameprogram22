@@ -44,6 +44,12 @@ public class BaseCharacter
     public Texture2D spriteYaserDead;
     public Texture2D spriteYaserUlt;
 
+
+    public Texture2D spriteVampireIdle;
+    public Texture2D spriteVampireAttack;
+    public Texture2D spriteVampireHurt;
+    public Texture2D spriteVampireDead;
+
     public BaseCharacter(string name, int hp, int atk, Vector2 pos)
     {
         Name = name;
@@ -85,7 +91,18 @@ public class BaseCharacter
     {
         Texture2D currentTexture = spriteIdle;
 
-        if (Name == "Yaser")
+        if (this is Vampire)
+        {
+            switch (CurrentState)
+            {
+                case CharacterState.Idle: currentTexture = Vampire.spriteVampireIdleStatic; break;
+                case CharacterState.Attack: currentTexture = Vampire.spriteVampireAttackStatic; break;
+                case CharacterState.Hurt: currentTexture = Vampire.spriteVampireHurtStatic; break;
+                case CharacterState.Dead: currentTexture = Vampire.spriteVampireDeadStatic; break;
+                default: currentTexture = Vampire.spriteVampireIdleStatic; break;
+            }
+        }
+        else if (Name == "Yaser")
         {
             switch (CurrentState)
             {
@@ -111,6 +128,8 @@ public class BaseCharacter
                 case CharacterState.Powerup: currentTexture = spritePowerup; break;
             }
         }
+
+
 
         if (currentTexture != null)
         {
@@ -139,6 +158,22 @@ public class BaseCharacter
                 }
             }
 
+            if (this is Vampire)
+            {
+                switch (CurrentState)
+                {
+                    case CharacterState.Idle: frameCount = 5; break;
+                    case CharacterState.Attack: frameCount = 6; break;
+                    case CharacterState.Hurt: frameCount = 2; break;
+                    case CharacterState.Dead: frameCount = 8; break;
+                    default: frameCount = 5; break;
+                }
+            }
+            else if (!(this is Player) && CurrentState == CharacterState.Dead)
+            {
+                frameCount = frameCountDead;
+            }
+
             if (Name == "Renato" && CurrentState == CharacterState.Attack)
             {
                 frameCount = 8;
@@ -149,9 +184,17 @@ public class BaseCharacter
             if (animationTimer >= FrameTime)
             {
                 animationTimer = 0f;
-                currentFrame++;
 
-                if (Name == "Yaser")
+                if (CurrentState != CharacterState.Dead)
+                {
+                    currentFrame++;
+                }
+                else if (currentFrame < frameCount - 1)
+                {
+                    currentFrame++;
+                }
+
+                if (Name == "Yaser" || this is Vampire)
                 {
                     if ((CurrentState == CharacterState.Attack || CurrentState == CharacterState.Hurt) && currentFrame >= frameCount)
                     {
@@ -165,10 +208,6 @@ public class BaseCharacter
                     }
                     else if (CurrentState == CharacterState.Dead && currentFrame >= frameCount)
                     {
-                        if (currentFrame >= frameCount)
-                        {
-                            currentFrame = frameCount - 1;
-                        }
                     }
                 }
 
@@ -219,7 +258,21 @@ public class BaseCharacter
     }
     public virtual void Draw(SpriteBatch spriteBatch, Color characterColor, SpriteFont font)
     {
-        Texture2D currentTexture = spriteIdle;
+        Texture2D currentTexture = null;
+
+        if (this is Vampire)
+        {
+            switch (CurrentState)
+            {
+                case CharacterState.Idle: currentTexture = Vampire.spriteVampireIdleStatic; break;
+                case CharacterState.Attack: currentTexture = Vampire.spriteVampireAttackStatic; break;
+                case CharacterState.Hurt: currentTexture = Vampire.spriteVampireHurtStatic; break;
+                case CharacterState.Dead: currentTexture = Vampire.spriteVampireDeadStatic; break;
+                default: currentTexture = Vampire.spriteVampireIdleStatic; break;
+            }
+        }
+
+
 
         if (Name == "Yaser")
         {
@@ -233,7 +286,7 @@ public class BaseCharacter
                 default: currentTexture = spriteYaserIdle; break;
             }
         }
-        else
+        else if (!(this is Vampire))
         {
             switch (CurrentState)
             {
@@ -246,6 +299,11 @@ public class BaseCharacter
                 case CharacterState.Heal: currentTexture = spriteHeal; break;
                 case CharacterState.Powerup: currentTexture = spritePowerup; break;
             }
+        }
+
+        if (currentTexture == null && this is Vampire)
+        {
+            System.Diagnostics.Debug.WriteLine($"🚨 KRİTİK: Switch blokları atlandı, currentTexture hala null!");
         }
 
         if (currentTexture != null)
@@ -288,6 +346,19 @@ public class BaseCharacter
                     case CharacterState.Dead: columns = 7; break;
                     case CharacterState.Ult: columns = 8; break;
                     default: columns = 6; break;
+                }
+            }
+
+            else if (this is Vampire)
+            {
+                rows = 1;
+                switch (CurrentState)
+                {
+                    case CharacterState.Idle: columns = 5; break;
+                    case CharacterState.Attack: columns = 6; break;
+                    case CharacterState.Hurt: columns = 2; break;
+                    case CharacterState.Dead: columns = 8; break;
+                    default: columns = 5; break;
                 }
             }
 
@@ -336,7 +407,15 @@ public class BaseCharacter
             }
 
             Rectangle destRect = new Rectangle((int)Position.X, (int)Position.Y, finalRenderWidth, finalRenderHeight);
-            spriteBatch.Draw(currentTexture, destRect, sourceRect, Color.White);
+
+            SpriteEffects effects = SpriteEffects.None;
+
+            if (this is Vampire)
+            {
+                effects = SpriteEffects.FlipHorizontally;
+            }
+
+            spriteBatch.Draw(currentTexture, destRect, sourceRect, Color.White, 0f, Vector2.Zero, effects, 0f);
         }
     }
     public virtual void TakeDamage(int damage)

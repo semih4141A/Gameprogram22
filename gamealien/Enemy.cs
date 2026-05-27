@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using SharpDX.DXGI;
 
 public class Enemy : BaseCharacter
@@ -9,6 +10,11 @@ public class Enemy : BaseCharacter
 
     public void TakeTurn(List<Player> allies, List<Enemy> enemies)
     {
+        if (CurrentHP <= 0)
+        {
+            System.Diagnostics.Debug.WriteLine($"{Name} öldüğü için turn atlıyor.");
+            return;
+        }
 
         if (allies == null || allies.Count == 0)
         {
@@ -16,6 +22,9 @@ public class Enemy : BaseCharacter
             return;
         }
         System.Random rnd = new System.Random();
+        this.CurrentState = CharacterState.Attack;
+        this.currentFrame = 0;
+        this.animationTimer = 0f;
 
         int targetIndex = rnd.Next(0, allies.Count);
 
@@ -35,13 +44,28 @@ public class Enemy : BaseCharacter
 
 public class Vampire : Enemy
 {
-    public Vampire(string name, int hp, int atk, Vector2 pos) : base(name, hp, atk, pos) { }
+    public static Texture2D spriteVampireIdleStatic;
+    public static Texture2D spriteVampireAttackStatic;
+    public static Texture2D spriteVampireHurtStatic;
+    public static Texture2D spriteVampireDeadStatic;
+
+    public Vampire(string name, int hp, int atk, Vector2 pos) : base(name, hp, atk, pos)
+    {
+        this.frameCountDead = 8;
+    }
+
+    public static void LoadSprites(Microsoft.Xna.Framework.Content.ContentManager content)
+    {
+        spriteVampireIdleStatic = content.Load<Texture2D>("Characters/Vampire/Idle");
+        spriteVampireAttackStatic = content.Load<Texture2D>("Characters/Vampire/Attack");
+        spriteVampireHurtStatic = content.Load<Texture2D>("Characters/Vampire/Hurt");
+        spriteVampireDeadStatic = content.Load<Texture2D>("Characters/Vampire/Death");
+    }
 
     public override bool ExecuteSkill(int skillIndex, List<Player> allies, List<Enemy> enemies, int targetIndex, bool isultimateunlocked)
     {
         allies[targetIndex].TakeDamage(Attackpower);
         this.Heal(10);
-        System.Diagnostics.Debug.WriteLine("Vampire bit and healed itself!");
         return true;
     }
 }
@@ -69,10 +93,11 @@ public class Barbarian : Enemy
         if (CurrentHP < (MaxHP / 2))
         {
             damage *= 2;
-            System.Diagnostics.Debug.WriteLine($"{Name} is RAGING! Double damage!");
+            System.Diagnostics.Debug.WriteLine($"{Name} is RAGING! Willl give double damage!");
         }
 
         allies[targetIndex].TakeDamage(damage);
+
         return true;
     }
 }
@@ -95,9 +120,9 @@ public class Witch : Enemy
     }
 }
 
-public class HealerGoblin : Enemy
+public class Sorcerer : Enemy
 {
-    public HealerGoblin(string name, int hp, int atk, Vector2 pos) : base(name, hp, atk, pos) { }
+    public Sorcerer(string name, int hp, int atk, Vector2 pos) : base(name, hp, atk, pos) { }
 
     public override bool ExecuteSkill(int skillIndex, List<Player> allies, List<Enemy> enemies, int targetIndex, bool isultimateunlocked)
     {
@@ -135,8 +160,8 @@ public class FinalBoss : Enemy
 
     public FinalBoss(string name, int hp, int atk, Vector2 pos) : base(name, hp, atk, pos)
     {
-        MaxHP = 300;
-        CurrentHP = 300;
+        MaxHP = 200;
+        CurrentHP = 200;
     }
 
     public override bool ExecuteSkill(int skillIndex, List<Player> allies, List<Enemy> enemies, int targetIndex, bool isultimateunlocked)
@@ -154,12 +179,12 @@ public class FinalBoss : Enemy
         else
         {
             System.Diagnostics.Debug.WriteLine($"{Name} uses VOID BLAST on {allies[targetIndex].Name}!");
-            allies[targetIndex].TakeDamage(Attackpower + 15);
+            allies[targetIndex].TakeDamage(Attackpower);
         }
 
         if (CurrentHP < (MaxHP * 0.3f))
         {
-            Attackpower = 30;
+            Attackpower = 40;
             System.Diagnostics.Debug.WriteLine($"{Name} is ENRAGED! Attack power increased!");
         }
 

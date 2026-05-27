@@ -106,3 +106,7 @@ c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\D
 c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Yaser\Hurt.xnb
 c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Yaser\Idle.xnb
 c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Yaser\UltimateAttack.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Vampire\Attack.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Vampire\Death.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Vampire\Hurt.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Vampire\Idle.xnb
