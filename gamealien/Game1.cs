@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SharpDX.Direct3D9;
+using Microsoft.Xna.Framework.Media;
 
 namespace gamealien;
 
@@ -20,8 +21,10 @@ public class Game1 : Game
     List<Texture2D> battlegrounds = new List<Texture2D>();
 
     enum BattleState { PlayerTurn, MainMenu, EnemyTurn, GameOver, Victory }
-
     BattleState currentState = BattleState.MainMenu;
+
+    Song mainMenuMusic;
+    Song battleMusic;
 
     int menuIndex = 0;
     int activeunitindex = 0;
@@ -77,6 +80,12 @@ public class Game1 : Game
         battlegrounds.Add(Content.Load<Texture2D>("Backgrounds/Battleground2"));
         battlegrounds.Add(Content.Load<Texture2D>("Backgrounds/Battleground3"));
         battlegrounds.Add(Content.Load<Texture2D>("Backgrounds/Battleground4"));
+        mainMenuMusic = Content.Load<Song>("Audio/MainMenuMusic");
+        battleMusic = Content.Load<Song>("Audio/BattleMusic");
+
+        MediaPlayer.IsRepeating = true;
+
+        MediaPlayer.Play(mainMenuMusic);
         pixel.SetData(new[] { Color.White });
 
         var leroy = allies.Find(a => a.Name == "Leroy");
@@ -145,6 +154,8 @@ public class Game1 : Game
         FinalBoss.LoadSprites(this.Content);
         System.Diagnostics.Debug.WriteLine("✅ KUTSALLIK: FinalBoss tekil resimleri hafızaya alındı.");
 
+        MediaPlayer.Volume = 0.4f;
+
 
 
     }
@@ -164,6 +175,7 @@ public class Game1 : Game
                 {
                     ResetWholeGame();
                     currentState = BattleState.PlayerTurn;
+                    MediaPlayer.Play(battleMusic);
                 }
                 else if (menuIndex == 1)
                 {
@@ -184,16 +196,19 @@ public class Game1 : Game
                 {
                     ResetWholeGame();
                     currentState = BattleState.PlayerTurn;
+                    MediaPlayer.Play(battleMusic);
                 }
                 if (kstate.IsKeyDown(Keys.M) && oldState.IsKeyUp(Keys.M))
                 {
                     currentState = BattleState.MainMenu;
+                    MediaPlayer.Play(mainMenuMusic);
                 }
             }
 
             if (currentState == BattleState.Victory && kstate.IsKeyDown(Keys.Enter) && oldState.IsKeyUp(Keys.Enter))
             {
                 currentState = BattleState.MainMenu;
+                MediaPlayer.Play(mainMenuMusic);
             }
 
             oldState = kstate;

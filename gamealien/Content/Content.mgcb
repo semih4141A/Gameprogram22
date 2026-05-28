@@ -13,6 +13,18 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin Audio/BattleMusic.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Audio/BattleMusic.mp3
+
+#begin Audio/MainMenuMusic.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:Audio/MainMenuMusic.mp3
+
 #begin Backgrounds/Battleground1.png
 /importer:TextureImporter
 /processor:TextureProcessor
