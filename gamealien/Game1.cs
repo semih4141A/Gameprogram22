@@ -50,9 +50,9 @@ public class Game1 : Game
         allies.Add(new Player.Renato("Renato", 70, 60, 15, new Vector2(150, 215)));
         allies.Add(new Player.Yaser("Yaser", 70, 60, 20, new Vector2(0, 160)));
 
-        enemies.Add(new Vampire("Vampire", 60, 10, new Vector2(500, 200)));
-        enemies.Add(new Skeleton("Skeleton", 40, 15, new Vector2(580, 200)));
-        enemies.Add(new Vampire("Vampire", 60, 10, new Vector2(660, 200)));
+        enemies.Add(new Vampire("Vampire", 60, 10, new Vector2(450, 175)));
+        enemies.Add(new Skeleton("Skeleton", 40, 15, new Vector2(550, 200)));
+        enemies.Add(new Vampire("Vampire", 60, 10, new Vector2(650, 175)));
 
         base.Initialize();
     }
@@ -113,6 +113,18 @@ public class Game1 : Game
         Vampire.LoadSprites(this.Content);
         System.Diagnostics.Debug.WriteLine("✅ KUTSALLIK: Vampir resimleri static olarak hafızaya alındı.");
 
+        Skeleton.LoadSprites(this.Content);
+        System.Diagnostics.Debug.WriteLine("✅ KUTSALLIK: Skeleton resimleri static olarak hafızaya alındı.");
+
+        Bat.LoadSprites(this.Content);
+        System.Diagnostics.Debug.WriteLine("✅ KUTSALLIK: Yarasa (Bat) resimleri static olarak hafızaya alındı.");
+
+        EvilWizard.LoadSprites(this.Content);
+        System.Diagnostics.Debug.WriteLine("✅ KUTSALLIK: EvilWizard resimleri static olarak hafızaya alındı.");
+
+        Sorcerer.LoadSprites(this.Content);
+        System.Diagnostics.Debug.WriteLine("✅ KUTSALLIK: Sorcerer resimleri static olarak hafızaya alındı.");
+
 
 
     }
@@ -150,19 +162,19 @@ public class Game1 : Game
             if (currentWave == 2)
             {
                 enemies.Add(new Zombie("Zombie", 60, 10, new Vector2(500, 200)));
-                enemies.Add(new Barbarian("Barbarian", 80, 15, new Vector2(580, 200)));
+                enemies.Add(new Bat("Bat", 80, 15, new Vector2(580, 200)));
                 enemies.Add(new Zombie("Zombie", 60, 10, new Vector2(660, 200)));
             }
             else if (currentWave == 3)
             {
-                enemies.Add(new Witch("Witch", 50, 20, new Vector2(500, 200)));
+                enemies.Add(new EvilWizard("EvilWizard", 50, 20, new Vector2(500, 200)));
                 enemies.Add(new Sorcerer("Sorcerer", 50, 5, new Vector2(580, 200)));
-                enemies.Add(new Witch("Witch", 50, 20, new Vector2(660, 200)));
+                enemies.Add(new EvilWizard("EvilWizard", 50, 20, new Vector2(660, 200)));
             }
             else if (currentWave == 4)
             {
                 enemies.Add(new FinalBoss("FinalBoss", 200, 30, new Vector2(580, 200)));
-                enemies.Add(new Witch("Witch", 50, 20, new Vector2(500, 200)));
+                enemies.Add(new EvilWizard("EvilWizard", 50, 20, new Vector2(500, 200)));
                 enemies.Add(new Sorcerer("Sorcerer", 50, 5, new Vector2(660, 200)));
             }
 
@@ -340,8 +352,14 @@ public class Game1 : Game
         );
         enemies.RemoveAll(enemy =>
             (enemy is Vampire && enemy.CurrentState == BaseCharacter.CharacterState.Dead && enemy.currentFrame >= 7) ||
-            (!(enemy is Vampire) && enemy.CurrentState == BaseCharacter.CharacterState.Dead)
+            (enemy is Skeleton && enemy.CurrentState == BaseCharacter.CharacterState.Dead && enemy.currentFrame >= 3) ||
+            (enemy is Bat && enemy.CurrentState == BaseCharacter.CharacterState.Dead && enemy.currentFrame >= 3) ||
+            (enemy is EvilWizard && enemy.CurrentState == BaseCharacter.CharacterState.Dead && enemy.currentFrame >= 6) ||
+            // 🔥 YENİ: Sorcerer 19 kareyi (0'dan 18'e) oynasın, tam bitince listeden uçsun!
+            (enemy is Sorcerer && enemy.CurrentState == BaseCharacter.CharacterState.Dead && enemy.currentFrame >= 16) ||
+            (!(enemy is Vampire) && !(enemy is Skeleton) && !(enemy is Bat) && !(enemy is EvilWizard) && !(enemy is Sorcerer) && enemy.CurrentState == BaseCharacter.CharacterState.Dead)
         );
+
 
 
         if (currentState == BattleState.PlayerTurn)
@@ -472,14 +490,14 @@ public class Game1 : Game
             enemies[i].Draw(_spriteBatch, c, gameFont);
 
             int enemyUiX = 500 + (i * 80);
-            int enemyUiY = 140;
+            int enemyUiY = 190;
 
             string enemyName = enemies[i].Name;
             Vector2 enemyNameSize = gameFont.MeasureString(enemyName);
-            Vector2 enemyNamePos = new Vector2(enemyUiX + (50 / 2) - (enemyNameSize.X / 2), enemyUiY - 20);
+            Vector2 enemyNamePos = new Vector2(enemyUiX + (50 / 2) - (enemyNameSize.X / 2), enemyUiY - 10);
             _spriteBatch.DrawString(gameFont, enemyName, enemyNamePos, Color.White);
 
-            DrawHealthBar(new Vector2(enemyUiX, enemyUiY + 25), enemies[i].CurrentHP, enemies[i].MaxHP);
+            DrawHealthBar(new Vector2(enemyUiX, enemyUiY + 20), enemies[i].CurrentHP, enemies[i].MaxHP);
         }
 
         if (currentState == BattleState.PlayerTurn)

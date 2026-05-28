@@ -65,6 +65,7 @@ public class Vampire : Enemy
     public override bool ExecuteSkill(int skillIndex, List<Player> allies, List<Enemy> enemies, int targetIndex, bool isultimateunlocked)
     {
         allies[targetIndex].TakeDamage(Attackpower);
+        System.Diagnostics.Debug.WriteLine($"{Name} uses Life Drain on {allies[targetIndex].Name}!");
         this.Heal(10);
         return true;
     }
@@ -72,70 +73,114 @@ public class Vampire : Enemy
 
 public class Skeleton : Enemy
 {
+    public static Texture2D spriteSkeletonIdleStatic;
+    public static Texture2D spriteSkeletonAttackStatic;
+    public static Texture2D spriteSkeletonHurtStatic;
+    public static Texture2D spriteSkeletonDeadStatic;
+
     public Skeleton(string name, int hp, int atk, Vector2 pos) : base(name, hp, atk, pos) { }
+
+    public static void LoadSprites(Microsoft.Xna.Framework.Content.ContentManager content)
+    {
+        spriteSkeletonIdleStatic = content.Load<Texture2D>("Characters/Skeleton/Idle");
+        spriteSkeletonAttackStatic = content.Load<Texture2D>("Characters/Skeleton/Attack");
+        spriteSkeletonHurtStatic = content.Load<Texture2D>("Characters/Skeleton/Hurt");
+        spriteSkeletonDeadStatic = content.Load<Texture2D>("Characters/Skeleton/Death");
+    }
 
     public override bool ExecuteSkill(int skillIndex, List<Player> allies, List<Enemy> enemies, int targetIndex, bool isultimateunlocked)
     {
         allies[targetIndex].TakeDamage(Attackpower + 10);
-        System.Diagnostics.Debug.WriteLine("Skeleton uses Bone Crush for extra damage!");
+        System.Diagnostics.Debug.WriteLine("Skeleton uses Shield Crush for extra damage!");
         return true;
     }
 }
 
-public class Barbarian : Enemy
+public class Bat : Enemy
 {
-    public Barbarian(string name, int hp, int atk, Vector2 pos) : base(name, hp, atk, pos) { }
+    public static Texture2D spriteBatIdleStatic;
+    public static Texture2D spriteBatAttackStatic;
+    public static Texture2D spriteBatHurtStatic;
+    public static Texture2D spriteBatDeadStatic;
+
+    public Bat(string name, int hp, int atk, Vector2 pos) : base(name, hp, atk, pos) { }
+
+    public static void LoadSprites(Microsoft.Xna.Framework.Content.ContentManager content)
+    {
+        spriteBatIdleStatic = content.Load<Texture2D>("Characters/Bat/idle");
+        spriteBatAttackStatic = content.Load<Texture2D>("Characters/Bat/attack");
+        spriteBatHurtStatic = content.Load<Texture2D>("Characters/Bat/hurt");
+        spriteBatDeadStatic = content.Load<Texture2D>("Characters/Bat/death");
+    }
 
     public override bool ExecuteSkill(int skillIndex, List<Player> allies, List<Enemy> enemies, int targetIndex, bool isultimateunlocked)
     {
-        int damage = Attackpower;
+        var target = allies[targetIndex];
+        int baseDamage = Attackpower;
 
-        if (CurrentHP < (MaxHP / 2))
+        // 🔥 KRİTİK: Eğer hedef müttefikin canı %50'nin altındaysa zehir coşar, 2.5 kat vurur!
+        if (target.CurrentHP < (target.MaxHP / 2))
         {
-            damage *= 2;
-            System.Diagnostics.Debug.WriteLine($"{Name} is RAGING! Willl give double damage!");
+            baseDamage = (int)(baseDamage * 2.5f);
+            System.Diagnostics.Debug.WriteLine($"⚠️ {Name} enjected Vampiric Venom into a weak target! Deadly Damage!");
         }
 
-        allies[targetIndex].TakeDamage(damage);
-
+        // Hasarı vur
+        target.TakeDamage(baseDamage);
         return true;
     }
 }
 
-public class Witch : Enemy
+public class EvilWizard : Enemy
 {
-    public Witch(string name, int hp, int atk, Vector2 pos) : base(name, hp, atk, pos) { }
+    // 🔥 EVIL WIZARD İÇİN STATİC TEXTURE ALANLARI
+    public static Texture2D spriteWizardIdleStatic;
+    public static Texture2D spriteWizardAttackStatic;
+    public static Texture2D spriteWizardHurtStatic;
+    public static Texture2D spriteWizardDeadStatic;
+
+    public EvilWizard(string name, int hp, int atk, Vector2 pos) : base(name, hp, atk, pos) { }
+
+    // MGCB Editor içindeki büyük/küçük harf durumuna göre (Idle, Attack, Hurt, Death)
+    public static void LoadSprites(Microsoft.Xna.Framework.Content.ContentManager content)
+    {
+        spriteWizardIdleStatic = content.Load<Texture2D>("Characters/EvilWizard/Idle");
+        spriteWizardAttackStatic = content.Load<Texture2D>("Characters/EvilWizard/Attack");
+        spriteWizardHurtStatic = content.Load<Texture2D>("Characters/EvilWizard/Hurt");
+        spriteWizardDeadStatic = content.Load<Texture2D>("Characters/EvilWizard/Death");
+    }
 
     public override bool ExecuteSkill(int skillIndex, List<Player> allies, List<Enemy> enemies, int targetIndex, bool isultimateunlocked)
     {
-
         allies[targetIndex].TakeDamage(Attackpower);
-
-
-        allies[targetIndex].CurrentMP -= 15;
-        if (allies[targetIndex].CurrentMP < 0) allies[targetIndex].CurrentMP = 0;
-
-        System.Diagnostics.Debug.WriteLine($"{Name} drained {15} MP from {allies[targetIndex].Name}");
-        return true;
+        allies[targetIndex].CurrentMP -= 15; if (allies[targetIndex].CurrentMP < 0) allies[targetIndex].CurrentMP = 0;
+        System.Diagnostics.Debug.WriteLine($"{Name} drained {15} MP from {allies[targetIndex].Name}"); return true;
     }
 }
 
 public class Sorcerer : Enemy
 {
+    // 🔥 SORCERER İÇİN STATİC TEXTURE ALANLARI
+    public static Texture2D spriteSorcererIdleStatic;
+    public static Texture2D spriteSorcererAttackStatic;
+    public static Texture2D spriteSorcererDeadStatic;
+
     public Sorcerer(string name, int hp, int atk, Vector2 pos) : base(name, hp, atk, pos) { }
+
+    // MGCB Editor'e eklediğin verbatim dosya isimlerine göre yükleme
+    public static void LoadSprites(Microsoft.Xna.Framework.Content.ContentManager content)
+    {
+        spriteSorcererIdleStatic = content.Load<Texture2D>("Characters/Sorcerer/Idle");
+        spriteSorcererAttackStatic = content.Load<Texture2D>("Characters/Sorcerer/Attack");
+        spriteSorcererDeadStatic = content.Load<Texture2D>("Characters/Sorcerer/Death");
+    }
 
     public override bool ExecuteSkill(int skillIndex, List<Player> allies, List<Enemy> enemies, int targetIndex, bool isultimateunlocked)
     {
-
         Enemy weakestAlly = enemies[0];
-        foreach (var e in enemies)
-        {
-            if (e.CurrentHP < weakestAlly.CurrentHP) weakestAlly = e;
-        }
-
+        foreach (var e in enemies) { if (e.CurrentHP < weakestAlly.CurrentHP) weakestAlly = e; }
         weakestAlly.Heal(20);
-        System.Diagnostics.Debug.WriteLine($"{Name} protected his team and healed {weakestAlly.Name}!");
-        return true;
+        System.Diagnostics.Debug.WriteLine($"{Name} healed {weakestAlly.Name}!"); return true;
     }
 }
 

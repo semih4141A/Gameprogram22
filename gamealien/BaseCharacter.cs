@@ -44,7 +44,6 @@ public class BaseCharacter
     public Texture2D spriteYaserDead;
     public Texture2D spriteYaserUlt;
 
-
     public Texture2D spriteVampireIdle;
     public Texture2D spriteVampireAttack;
     public Texture2D spriteVampireHurt;
@@ -66,7 +65,6 @@ public class BaseCharacter
         Defend,
         Hurt,
         Dead,
-
         Ult,
         Heal,
         Powerup
@@ -102,6 +100,52 @@ public class BaseCharacter
                 default: currentTexture = Vampire.spriteVampireIdleStatic; break;
             }
         }
+        else if (this is Skeleton)
+        {
+            switch (CurrentState)
+            {
+                case CharacterState.Idle: currentTexture = Skeleton.spriteSkeletonIdleStatic; break;
+                case CharacterState.Attack: currentTexture = Skeleton.spriteSkeletonAttackStatic; break;
+                case CharacterState.Hurt: currentTexture = Skeleton.spriteSkeletonHurtStatic; break;
+                case CharacterState.Dead: currentTexture = Skeleton.spriteSkeletonDeadStatic; break;
+                default: currentTexture = Skeleton.spriteSkeletonIdleStatic; break;
+            }
+        }
+
+        else if (this is Bat)
+        {
+            switch (CurrentState)
+            {
+                case CharacterState.Idle: currentTexture = Bat.spriteBatIdleStatic; break;
+                case CharacterState.Attack: currentTexture = Bat.spriteBatAttackStatic; break;
+                case CharacterState.Hurt: currentTexture = Bat.spriteBatHurtStatic; break;
+                case CharacterState.Dead: currentTexture = Bat.spriteBatDeadStatic; break;
+                default: currentTexture = Bat.spriteBatIdleStatic; break;
+            }
+        }
+
+        else if (this is EvilWizard)
+        {
+            switch (CurrentState)
+            {
+                case CharacterState.Idle: currentTexture = EvilWizard.spriteWizardIdleStatic; break;
+                case CharacterState.Attack: currentTexture = EvilWizard.spriteWizardAttackStatic; break;
+                case CharacterState.Hurt: currentTexture = EvilWizard.spriteWizardHurtStatic; break;
+                case CharacterState.Dead: currentTexture = EvilWizard.spriteWizardDeadStatic; break;
+                default: currentTexture = EvilWizard.spriteWizardIdleStatic; break;
+            }
+        }
+        else if (this is Sorcerer)
+        {
+            switch (CurrentState)
+            {
+                case CharacterState.Idle: currentTexture = Sorcerer.spriteSorcererIdleStatic; break;
+                case CharacterState.Attack: currentTexture = Sorcerer.spriteSorcererAttackStatic; break;
+                case CharacterState.Hurt: currentTexture = Sorcerer.spriteSorcererIdleStatic; break; // Hurt olmadığı için Idle kullansın
+                case CharacterState.Dead: currentTexture = Sorcerer.spriteSorcererDeadStatic; break;
+                default: currentTexture = Sorcerer.spriteSorcererIdleStatic; break;
+            }
+        }
         else if (Name == "Yaser")
         {
             switch (CurrentState)
@@ -129,8 +173,6 @@ public class BaseCharacter
             }
         }
 
-
-
         if (currentTexture != null)
         {
             int frameCount = 4;
@@ -157,8 +199,7 @@ public class BaseCharacter
                     case CharacterState.Ult: frameCount = 8; break;
                 }
             }
-
-            if (this is Vampire)
+            else if (this is Vampire)
             {
                 switch (CurrentState)
                 {
@@ -169,6 +210,54 @@ public class BaseCharacter
                     default: frameCount = 5; break;
                 }
             }
+            else if (this is Skeleton)
+            {
+                switch (CurrentState)
+                {
+                    case CharacterState.Idle: frameCount = 4; break;
+                    case CharacterState.Attack: frameCount = 8; break;
+                    case CharacterState.Hurt: frameCount = 4; break;
+                    case CharacterState.Dead: frameCount = 4; break;
+                    default: frameCount = 4; break;
+                }
+            }
+
+            else if (this is Bat)
+            {
+                switch (CurrentState)
+                {
+                    case CharacterState.Idle: frameCount = 11; break;
+                    case CharacterState.Attack: frameCount = 11; break;
+                    case CharacterState.Hurt: frameCount = 3; break;
+                    case CharacterState.Dead: frameCount = 4; break;
+                    default: frameCount = 11; break;
+                }
+            }
+
+            else if (this is EvilWizard)
+            {
+                switch (CurrentState)
+                {
+                    case CharacterState.Idle: frameCount = 8; break;   // 8 kare
+                    case CharacterState.Attack: frameCount = 8; break; // 8 kare
+                    case CharacterState.Hurt: frameCount = 3; break;   // 3 kare
+                    case CharacterState.Dead: frameCount = 7; break;   // 7 kare
+                    default: frameCount = 8; break;
+                }
+            }
+
+            else if (this is Sorcerer)
+            {
+                switch (CurrentState)
+                {
+                    case CharacterState.Idle: frameCount = 1; break;   // Tek foto demiştin, 1 kare yaptık!
+                    case CharacterState.Attack: frameCount = 10; break; // 11 kare
+                    case CharacterState.Hurt: frameCount = 1; break;   // Hurt için yine 1 kare
+                    case CharacterState.Dead: frameCount = 17; break;   // Tam 19 kare!
+                    default: frameCount = 1; break;
+                }
+            }
+
             else if (!(this is Player) && CurrentState == CharacterState.Dead)
             {
                 frameCount = frameCountDead;
@@ -194,7 +283,7 @@ public class BaseCharacter
                     currentFrame++;
                 }
 
-                if (Name == "Yaser" || this is Vampire)
+                if (Name == "Yaser" || this is Vampire || this is Skeleton || this is Bat || this is EvilWizard || this is Sorcerer)
                 {
                     if ((CurrentState == CharacterState.Attack || CurrentState == CharacterState.Hurt) && currentFrame >= frameCount)
                     {
@@ -208,11 +297,9 @@ public class BaseCharacter
                     }
                     else if (CurrentState == CharacterState.Dead && currentFrame >= frameCount)
                     {
+                        currentFrame = frameCount - 1;
                     }
                 }
-
-
-
                 else
                 {
                     if (CurrentState == CharacterState.Heal && currentFrame >= frameCount)
@@ -227,7 +314,7 @@ public class BaseCharacter
                     }
                     else if (CurrentState == CharacterState.Ult && currentFrame >= frameCount)
                     {
-                        CurrentState = CharacterState.Dead;
+                        CurrentState = CharacterState.Idle;
                         currentFrame = 0;
                     }
                     else if (CurrentState == CharacterState.Hurt && currentFrame >= frameCount)
@@ -253,9 +340,9 @@ public class BaseCharacter
                     }
                 }
             }
-
         }
     }
+
     public virtual void Draw(SpriteBatch spriteBatch, Color characterColor, SpriteFont font)
     {
         Texture2D currentTexture = null;
@@ -271,10 +358,55 @@ public class BaseCharacter
                 default: currentTexture = Vampire.spriteVampireIdleStatic; break;
             }
         }
+        else if (this is Skeleton)
+        {
+            switch (CurrentState)
+            {
+                case CharacterState.Idle: currentTexture = Skeleton.spriteSkeletonIdleStatic; break;
+                case CharacterState.Attack: currentTexture = Skeleton.spriteSkeletonAttackStatic; break;
+                case CharacterState.Hurt: currentTexture = Skeleton.spriteSkeletonHurtStatic; break;
+                case CharacterState.Dead: currentTexture = Skeleton.spriteSkeletonDeadStatic; break;
+                default: currentTexture = Skeleton.spriteSkeletonIdleStatic; break;
+            }
+        }
 
+        else if (this is Bat)
+        {
+            switch (CurrentState)
+            {
+                case CharacterState.Idle: currentTexture = Bat.spriteBatIdleStatic; break;
+                case CharacterState.Attack: currentTexture = Bat.spriteBatAttackStatic; break;
+                case CharacterState.Hurt: currentTexture = Bat.spriteBatHurtStatic; break;
+                case CharacterState.Dead: currentTexture = Bat.spriteBatDeadStatic; break;
+                default: currentTexture = Bat.spriteBatIdleStatic; break;
+            }
+        }
 
+        else if (this is EvilWizard)
+        {
+            switch (CurrentState)
+            {
+                case CharacterState.Idle: currentTexture = EvilWizard.spriteWizardIdleStatic; break;
+                case CharacterState.Attack: currentTexture = EvilWizard.spriteWizardAttackStatic; break;
+                case CharacterState.Hurt: currentTexture = EvilWizard.spriteWizardHurtStatic; break;
+                case CharacterState.Dead: currentTexture = EvilWizard.spriteWizardDeadStatic; break;
+                default: currentTexture = EvilWizard.spriteWizardIdleStatic; break;
+            }
+        }
 
-        if (Name == "Yaser")
+        else if (this is Sorcerer)
+        {
+            switch (CurrentState)
+            {
+                case CharacterState.Idle: currentTexture = Sorcerer.spriteSorcererIdleStatic; break;
+                case CharacterState.Attack: currentTexture = Sorcerer.spriteSorcererAttackStatic; break;
+                case CharacterState.Hurt: currentTexture = Sorcerer.spriteSorcererIdleStatic; break;
+                case CharacterState.Dead: currentTexture = Sorcerer.spriteSorcererDeadStatic; break;
+                default: currentTexture = Sorcerer.spriteSorcererIdleStatic; break;
+            }
+        }
+
+        else if (Name == "Yaser")
         {
             switch (CurrentState)
             {
@@ -286,7 +418,7 @@ public class BaseCharacter
                 default: currentTexture = spriteYaserIdle; break;
             }
         }
-        else if (!(this is Vampire))
+        else
         {
             switch (CurrentState)
             {
@@ -299,11 +431,6 @@ public class BaseCharacter
                 case CharacterState.Heal: currentTexture = spriteHeal; break;
                 case CharacterState.Powerup: currentTexture = spritePowerup; break;
             }
-        }
-
-        if (currentTexture == null && this is Vampire)
-        {
-            System.Diagnostics.Debug.WriteLine($"🚨 KRİTİK: Switch blokları atlandı, currentTexture hala null!");
         }
 
         if (currentTexture != null)
@@ -348,7 +475,6 @@ public class BaseCharacter
                     default: columns = 6; break;
                 }
             }
-
             else if (this is Vampire)
             {
                 rows = 1;
@@ -359,6 +485,57 @@ public class BaseCharacter
                     case CharacterState.Hurt: columns = 2; break;
                     case CharacterState.Dead: columns = 8; break;
                     default: columns = 5; break;
+                }
+            }
+            else if (this is Skeleton)
+            {
+                rows = 1;
+                switch (CurrentState)
+                {
+                    case CharacterState.Idle: columns = 4; break;
+                    case CharacterState.Attack: columns = 8; break;
+                    case CharacterState.Hurt: columns = 4; break;
+                    case CharacterState.Dead: columns = 4; break;
+                    default: columns = 4; break;
+                }
+            }
+
+            else if (this is Bat)
+            {
+                rows = 1;
+                switch (CurrentState)
+                {
+                    case CharacterState.Idle: columns = 11; break;
+                    case CharacterState.Attack: columns = 11; break;
+                    case CharacterState.Hurt: columns = 3; break;
+                    case CharacterState.Dead: columns = 4; break;
+                    default: columns = 11; break;
+                }
+            }
+
+            else if (this is EvilWizard)
+            {
+                rows = 1;
+                switch (CurrentState)
+                {
+                    case CharacterState.Idle: columns = 8; break;
+                    case CharacterState.Attack: columns = 8; break;
+                    case CharacterState.Hurt: columns = 3; break;
+                    case CharacterState.Dead: columns = 7; break;
+                    default: columns = 8; break;
+                }
+            }
+
+            else if (this is Sorcerer)
+            {
+                rows = 1;
+                switch (CurrentState)
+                {
+                    case CharacterState.Idle: columns = 1; break;   // 1 sütun
+                    case CharacterState.Attack: columns = 10; break; // 11 sütun
+                    case CharacterState.Hurt: columns = 1; break;   // 1 sütun
+                    case CharacterState.Dead: columns = 17; break;   // 19 sütun
+                    default: columns = 1; break;
                 }
             }
 
@@ -385,7 +562,6 @@ public class BaseCharacter
             int currentX = (currentCol * frameWidth) + xOffset;
             int currentY = currentRow * frameHeight;
 
-
             if (currentX < 0) currentX = 0;
             if (currentX + frameWidth > currentTexture.Width) currentX = currentTexture.Width - frameWidth;
             if (currentY + frameHeight > currentTexture.Height) currentY = currentTexture.Height - frameHeight;
@@ -399,7 +575,6 @@ public class BaseCharacter
                 finalRenderWidth = (int)(frameWidth * 1.35f);
                 finalRenderHeight = (int)(frameHeight * 1.35f);
             }
-
             else if (Name == "Yaser")
             {
                 finalRenderWidth = frameWidth;
@@ -409,8 +584,7 @@ public class BaseCharacter
             Rectangle destRect = new Rectangle((int)Position.X, (int)Position.Y, finalRenderWidth, finalRenderHeight);
 
             SpriteEffects effects = SpriteEffects.None;
-
-            if (this is Vampire)
+            if (this is Vampire || this is Skeleton || this is Bat || this is EvilWizard || this is Sorcerer)
             {
                 effects = SpriteEffects.FlipHorizontally;
             }
@@ -418,6 +592,7 @@ public class BaseCharacter
             spriteBatch.Draw(currentTexture, destRect, sourceRect, Color.White, 0f, Vector2.Zero, effects, 0f);
         }
     }
+
     public virtual void TakeDamage(int damage)
     {
         CurrentHP -= damage;
@@ -441,6 +616,5 @@ public class BaseCharacter
     public virtual bool ExecuteSkill(int skillIndex, List<Player> allies, List<Enemy> enemies, int targetIndex, bool isultimateunlocked)
     {
         return false;
-
     }
 }
