@@ -125,6 +125,9 @@ public class Game1 : Game
         Sorcerer.LoadSprites(this.Content);
         System.Diagnostics.Debug.WriteLine("✅ KUTSALLIK: Sorcerer resimleri static olarak hafızaya alındı.");
 
+        Zombie.LoadSprites(this.Content);
+        System.Diagnostics.Debug.WriteLine("✅ KUTSALLIK: Zombie resimleri static olarak hafızaya alındı.");
+
 
 
     }
@@ -351,14 +354,15 @@ public class Game1 : Game
             (ally.Name == "Leroy" && ally.CurrentState == BaseCharacter.CharacterState.Dead && ally.currentFrame >= 5)
         );
         enemies.RemoveAll(enemy =>
-            (enemy is Vampire && enemy.CurrentState == BaseCharacter.CharacterState.Dead && enemy.currentFrame >= 7) ||
-            (enemy is Skeleton && enemy.CurrentState == BaseCharacter.CharacterState.Dead && enemy.currentFrame >= 3) ||
-            (enemy is Bat && enemy.CurrentState == BaseCharacter.CharacterState.Dead && enemy.currentFrame >= 3) ||
-            (enemy is EvilWizard && enemy.CurrentState == BaseCharacter.CharacterState.Dead && enemy.currentFrame >= 6) ||
-            // 🔥 YENİ: Sorcerer 19 kareyi (0'dan 18'e) oynasın, tam bitince listeden uçsun!
-            (enemy is Sorcerer && enemy.CurrentState == BaseCharacter.CharacterState.Dead && enemy.currentFrame >= 16) ||
-            (!(enemy is Vampire) && !(enemy is Skeleton) && !(enemy is Bat) && !(enemy is EvilWizard) && !(enemy is Sorcerer) && enemy.CurrentState == BaseCharacter.CharacterState.Dead)
-        );
+             (enemy is Vampire && enemy.CurrentState == BaseCharacter.CharacterState.Dead && enemy.currentFrame >= 7) ||
+             (enemy is Skeleton && enemy.CurrentState == BaseCharacter.CharacterState.Dead && enemy.currentFrame >= 3) ||
+             (enemy is Bat && enemy.CurrentState == BaseCharacter.CharacterState.Dead && enemy.currentFrame >= 3) ||
+             (enemy is EvilWizard && enemy.CurrentState == BaseCharacter.CharacterState.Dead && enemy.currentFrame >= 6) ||
+             (enemy is Sorcerer && enemy.CurrentState == BaseCharacter.CharacterState.Dead && enemy.currentFrame >= 16) ||
+             // 🔥 YENİ: Zombie 6 karelik animasyonunun sonuna (index 5) gelince listeden temizlensin!
+             (enemy is Zombie && enemy.CurrentState == BaseCharacter.CharacterState.Dead && enemy.currentFrame >= 5) ||
+             (!(enemy is Vampire) && !(enemy is Skeleton) && !(enemy is Bat) && !(enemy is EvilWizard) && !(enemy is Sorcerer) && !(enemy is Zombie) && enemy.CurrentState == BaseCharacter.CharacterState.Dead)
+         );
 
 
 

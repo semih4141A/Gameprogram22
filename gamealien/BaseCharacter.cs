@@ -146,6 +146,17 @@ public class BaseCharacter
                 default: currentTexture = Sorcerer.spriteSorcererIdleStatic; break;
             }
         }
+        else if (this is Zombie)
+        {
+            switch (CurrentState)
+            {
+                case CharacterState.Idle: currentTexture = Zombie.spriteZombieIdleStatic; break;
+                case CharacterState.Attack: currentTexture = Zombie.spriteZombieAttackStatic; break;
+                case CharacterState.Hurt: currentTexture = Zombie.spriteZombieHurtStatic; break;
+                case CharacterState.Dead: currentTexture = Zombie.spriteZombieDeadStatic; break;
+                default: currentTexture = Zombie.spriteZombieIdleStatic; break;
+            }
+        }
         else if (Name == "Yaser")
         {
             switch (CurrentState)
@@ -257,6 +268,17 @@ public class BaseCharacter
                     default: frameCount = 1; break;
                 }
             }
+            else if (this is Zombie)
+            {
+                switch (CurrentState)
+                {
+                    case CharacterState.Idle: frameCount = 6; break;
+                    case CharacterState.Attack: frameCount = 6; break;
+                    case CharacterState.Hurt: frameCount = 6; break;
+                    case CharacterState.Dead: frameCount = 6; break;
+                    default: frameCount = 6; break;
+                }
+            }
 
             else if (!(this is Player) && CurrentState == CharacterState.Dead)
             {
@@ -283,7 +305,7 @@ public class BaseCharacter
                     currentFrame++;
                 }
 
-                if (Name == "Yaser" || this is Vampire || this is Skeleton || this is Bat || this is EvilWizard || this is Sorcerer)
+                if (Name == "Yaser" || this is Vampire || this is Skeleton || this is Bat || this is EvilWizard || this is Sorcerer || this is Zombie)
                 {
                     if ((CurrentState == CharacterState.Attack || CurrentState == CharacterState.Hurt) && currentFrame >= frameCount)
                     {
@@ -403,6 +425,17 @@ public class BaseCharacter
                 case CharacterState.Hurt: currentTexture = Sorcerer.spriteSorcererIdleStatic; break;
                 case CharacterState.Dead: currentTexture = Sorcerer.spriteSorcererDeadStatic; break;
                 default: currentTexture = Sorcerer.spriteSorcererIdleStatic; break;
+            }
+        }
+        else if (this is Zombie)
+        {
+            switch (CurrentState)
+            {
+                case CharacterState.Idle: currentTexture = Zombie.spriteZombieIdleStatic; break;
+                case CharacterState.Attack: currentTexture = Zombie.spriteZombieAttackStatic; break;
+                case CharacterState.Hurt: currentTexture = Zombie.spriteZombieHurtStatic; break;
+                case CharacterState.Dead: currentTexture = Zombie.spriteZombieDeadStatic; break;
+                default: currentTexture = Zombie.spriteZombieIdleStatic; break;
             }
         }
 
@@ -536,6 +569,18 @@ public class BaseCharacter
                     case CharacterState.Hurt: columns = 1; break;   // 1 sütun
                     case CharacterState.Dead: columns = 17; break;   // 19 sütun
                     default: columns = 1; break;
+                }
+            }
+            else if (this is Zombie)
+            {
+                rows = 1;
+                switch (CurrentState)
+                {
+                    case CharacterState.Idle: columns = 6; break;
+                    case CharacterState.Attack: columns = 6; break;
+                    case CharacterState.Hurt: columns = 6; break;
+                    case CharacterState.Dead: columns = 6; break;
+                    default: columns = 6; break;
                 }
             }
 

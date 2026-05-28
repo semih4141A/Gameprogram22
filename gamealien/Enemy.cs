@@ -186,14 +186,27 @@ public class Sorcerer : Enemy
 
 public class Zombie : Enemy
 {
+    // 🔥 ZOMBIE İÇİN ORTAK (STATIC) TEXTURE ALANLARI
+    public static Texture2D spriteZombieIdleStatic;
+    public static Texture2D spriteZombieAttackStatic;
+    public static Texture2D spriteZombieHurtStatic;
+    public static Texture2D spriteZombieDeadStatic;
+
     public Zombie(string name, int hp, int atk, Vector2 pos) : base(name, hp, atk, pos) { }
+
+    // MGCB Editor'deki dosya isimlerine (Attack_7, Death_8, Hurt_8, Idle_11) göre tam eşleme
+    public static void LoadSprites(Microsoft.Xna.Framework.Content.ContentManager content)
+    {
+        spriteZombieIdleStatic = content.Load<Texture2D>("Characters/Zombie/Idle");
+        spriteZombieAttackStatic = content.Load<Texture2D>("Characters/Zombie/Attack");
+        spriteZombieHurtStatic = content.Load<Texture2D>("Characters/Zombie/Hurt");
+        spriteZombieDeadStatic = content.Load<Texture2D>("Characters/Zombie/Death");
+    }
 
     public override bool ExecuteSkill(int skillIndex, List<Player> allies, List<Enemy> enemies, int targetIndex, bool isultimateunlocked)
     {
         allies[targetIndex].TakeDamage(Attackpower);
-
         allies[targetIndex].Attackpower = allies[targetIndex].BaseAttackPower / 2;
-
         System.Diagnostics.Debug.WriteLine($"{allies[targetIndex].Name}'s attack is weakened by bite from {Name}!");
         return true;
     }

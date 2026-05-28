@@ -125,3 +125,7 @@ c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\D
 c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\EvilWizard\Death.xnb
 c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\EvilWizard\Hurt.xnb
 c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\EvilWizard\Idle.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Zombie\Attack.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Zombie\Death.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Zombie\Hurt.xnb
+c:\Users\erens\Desktop\Create With Code\Board game\Gameprogram22\gamealien\bin\Debug\net8.0-windows\Content\Characters\Zombie\Idle.xnb
