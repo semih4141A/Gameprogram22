@@ -46,7 +46,7 @@ public class Game1 : Game
 
     protected override void Initialize()
     {
-        allies.Add(new Player.Leroy("Leroy", 100, 60, 20, new Vector2(300, 215)));
+        allies.Add(new Player.Leroy("Leroy", 100, 60, 999, new Vector2(300, 215)));
         allies.Add(new Player.Renato("Renato", 70, 60, 15, new Vector2(150, 215)));
         allies.Add(new Player.Yaser("Yaser", 70, 60, 20, new Vector2(0, 160)));
 
@@ -127,6 +127,9 @@ public class Game1 : Game
 
         Zombie.LoadSprites(this.Content);
         System.Diagnostics.Debug.WriteLine("✅ KUTSALLIK: Zombie resimleri static olarak hafızaya alındı.");
+
+        FinalBoss.LoadSprites(this.Content);
+        System.Diagnostics.Debug.WriteLine("✅ KUTSALLIK: FinalBoss tekil resimleri hafızaya alındı.");
 
 
 
@@ -358,10 +361,11 @@ public class Game1 : Game
              (enemy is Skeleton && enemy.CurrentState == BaseCharacter.CharacterState.Dead && enemy.currentFrame >= 3) ||
              (enemy is Bat && enemy.CurrentState == BaseCharacter.CharacterState.Dead && enemy.currentFrame >= 3) ||
              (enemy is EvilWizard && enemy.CurrentState == BaseCharacter.CharacterState.Dead && enemy.currentFrame >= 6) ||
-             (enemy is Sorcerer && enemy.CurrentState == BaseCharacter.CharacterState.Dead && enemy.currentFrame >= 16) ||
-             // 🔥 YENİ: Zombie 6 karelik animasyonunun sonuna (index 5) gelince listeden temizlensin!
+             (enemy is Sorcerer && enemy.CurrentState == BaseCharacter.CharacterState.Dead && enemy.currentFrame >= 15) ||
              (enemy is Zombie && enemy.CurrentState == BaseCharacter.CharacterState.Dead && enemy.currentFrame >= 5) ||
-             (!(enemy is Vampire) && !(enemy is Skeleton) && !(enemy is Bat) && !(enemy is EvilWizard) && !(enemy is Sorcerer) && !(enemy is Zombie) && enemy.CurrentState == BaseCharacter.CharacterState.Dead)
+             (enemy is FinalBoss && enemy.CurrentState == BaseCharacter.CharacterState.Dead && enemy.currentFrame >= FinalBoss.listBossDead.Count - 1) ||
+             (!(enemy is Vampire) && !(enemy is Skeleton) && !(enemy is Bat) && !(enemy is EvilWizard) && !(enemy is Sorcerer) && !(enemy is Zombie) && !(enemy is FinalBoss) && enemy.CurrentState == BaseCharacter.CharacterState.Dead)
+
          );
 
 

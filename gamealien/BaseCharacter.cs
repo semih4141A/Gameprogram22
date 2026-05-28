@@ -67,7 +67,9 @@ public class BaseCharacter
         Dead,
         Ult,
         Heal,
-        Powerup
+        Powerup,
+
+        Attack2
     }
 
     private CharacterState currentState = CharacterState.Idle;
@@ -141,7 +143,7 @@ public class BaseCharacter
             {
                 case CharacterState.Idle: currentTexture = Sorcerer.spriteSorcererIdleStatic; break;
                 case CharacterState.Attack: currentTexture = Sorcerer.spriteSorcererAttackStatic; break;
-                case CharacterState.Hurt: currentTexture = Sorcerer.spriteSorcererIdleStatic; break; // Hurt olmadığı için Idle kullansın
+                case CharacterState.Hurt: currentTexture = Sorcerer.spriteSorcererIdleStatic; break;
                 case CharacterState.Dead: currentTexture = Sorcerer.spriteSorcererDeadStatic; break;
                 default: currentTexture = Sorcerer.spriteSorcererIdleStatic; break;
             }
@@ -157,6 +159,7 @@ public class BaseCharacter
                 default: currentTexture = Zombie.spriteZombieIdleStatic; break;
             }
         }
+
         else if (Name == "Yaser")
         {
             switch (CurrentState)
@@ -169,6 +172,12 @@ public class BaseCharacter
                 default: currentTexture = spriteYaserIdle; break;
             }
         }
+
+        else if (this is FinalBoss)
+        {
+            currentTexture = spriteIdle;
+        }
+
         else
         {
             switch (CurrentState)
@@ -184,7 +193,7 @@ public class BaseCharacter
             }
         }
 
-        if (currentTexture != null)
+        if (currentTexture != null || this is FinalBoss)
         {
             int frameCount = 4;
             switch (CurrentState)
@@ -249,10 +258,10 @@ public class BaseCharacter
             {
                 switch (CurrentState)
                 {
-                    case CharacterState.Idle: frameCount = 8; break;   // 8 kare
-                    case CharacterState.Attack: frameCount = 8; break; // 8 kare
-                    case CharacterState.Hurt: frameCount = 3; break;   // 3 kare
-                    case CharacterState.Dead: frameCount = 7; break;   // 7 kare
+                    case CharacterState.Idle: frameCount = 8; break;
+                    case CharacterState.Attack: frameCount = 8; break;
+                    case CharacterState.Hurt: frameCount = 3; break;
+                    case CharacterState.Dead: frameCount = 7; break;
                     default: frameCount = 8; break;
                 }
             }
@@ -261,10 +270,10 @@ public class BaseCharacter
             {
                 switch (CurrentState)
                 {
-                    case CharacterState.Idle: frameCount = 1; break;   // Tek foto demiştin, 1 kare yaptık!
-                    case CharacterState.Attack: frameCount = 10; break; // 11 kare
-                    case CharacterState.Hurt: frameCount = 1; break;   // Hurt için yine 1 kare
-                    case CharacterState.Dead: frameCount = 17; break;   // Tam 19 kare!
+                    case CharacterState.Idle: frameCount = 1; break;
+                    case CharacterState.Attack: frameCount = 10; break;
+                    case CharacterState.Hurt: frameCount = 1; break;
+                    case CharacterState.Dead: frameCount = 17; break;
                     default: frameCount = 1; break;
                 }
             }
@@ -277,6 +286,19 @@ public class BaseCharacter
                     case CharacterState.Hurt: frameCount = 6; break;
                     case CharacterState.Dead: frameCount = 6; break;
                     default: frameCount = 6; break;
+                }
+            }
+
+            else if (this is FinalBoss)
+            {
+                switch (CurrentState)
+                {
+                    case CharacterState.Idle: frameCount = FinalBoss.listBossIdle.Count; break;
+                    case CharacterState.Attack: frameCount = FinalBoss.listBossAttack.Count; break;
+                    case CharacterState.Attack2: frameCount = FinalBoss.listBossCast.Count; break;
+                    case CharacterState.Hurt: frameCount = FinalBoss.listBossHurt.Count; break;
+                    case CharacterState.Dead: frameCount = FinalBoss.listBossDead.Count; break;
+                    default: frameCount = FinalBoss.listBossIdle.Count; break;
                 }
             }
 
@@ -305,12 +327,13 @@ public class BaseCharacter
                     currentFrame++;
                 }
 
-                if (Name == "Yaser" || this is Vampire || this is Skeleton || this is Bat || this is EvilWizard || this is Sorcerer || this is Zombie)
+                if (Name == "Yaser" || this is Vampire || this is Skeleton || this is Bat || this is EvilWizard || this is Sorcerer || this is Zombie || this is FinalBoss)
                 {
                     if ((CurrentState == CharacterState.Attack || CurrentState == CharacterState.Hurt) && currentFrame >= frameCount)
                     {
                         CurrentState = CharacterState.Idle;
                         currentFrame = 0;
+                        animationTimer = 0f;
                     }
                     else if (CurrentState == CharacterState.Ult && currentFrame >= frameCount)
                     {
@@ -367,6 +390,27 @@ public class BaseCharacter
 
     public virtual void Draw(SpriteBatch spriteBatch, Color characterColor, SpriteFont font)
     {
+        if (this is FinalBoss)
+        {
+            Texture2D singleFrameTexture = null;
+
+            switch (CurrentState)
+            {
+                case CharacterState.Idle: singleFrameTexture = FinalBoss.listBossIdle[currentFrame % FinalBoss.listBossIdle.Count]; break;
+                case CharacterState.Attack: singleFrameTexture = FinalBoss.listBossAttack[currentFrame % FinalBoss.listBossAttack.Count]; break;
+                case CharacterState.Attack2: singleFrameTexture = FinalBoss.listBossCast[currentFrame % FinalBoss.listBossCast.Count]; break;
+                case CharacterState.Hurt: singleFrameTexture = FinalBoss.listBossHurt[currentFrame % FinalBoss.listBossHurt.Count]; break;
+                case CharacterState.Dead: singleFrameTexture = FinalBoss.listBossDead[currentFrame % FinalBoss.listBossDead.Count]; break;
+                default: singleFrameTexture = FinalBoss.listBossIdle[0]; break;
+            }
+
+            if (singleFrameTexture != null)
+            {
+                Rectangle destRectBoss = new Rectangle((int)Position.X, (int)Position.Y, singleFrameTexture.Width, singleFrameTexture.Height);
+                spriteBatch.Draw(singleFrameTexture, destRectBoss, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 0f);
+            }
+            return;
+        }
         Texture2D currentTexture = null;
 
         if (this is Vampire)
@@ -564,10 +608,10 @@ public class BaseCharacter
                 rows = 1;
                 switch (CurrentState)
                 {
-                    case CharacterState.Idle: columns = 1; break;   // 1 sütun
-                    case CharacterState.Attack: columns = 10; break; // 11 sütun
-                    case CharacterState.Hurt: columns = 1; break;   // 1 sütun
-                    case CharacterState.Dead: columns = 17; break;   // 19 sütun
+                    case CharacterState.Idle: columns = 1; break;
+                    case CharacterState.Attack: columns = 10; break;
+                    case CharacterState.Hurt: columns = 1; break;
+                    case CharacterState.Dead: columns = 17; break;
                     default: columns = 1; break;
                 }
             }

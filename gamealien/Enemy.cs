@@ -118,14 +118,12 @@ public class Bat : Enemy
         var target = allies[targetIndex];
         int baseDamage = Attackpower;
 
-        // 🔥 KRİTİK: Eğer hedef müttefikin canı %50'nin altındaysa zehir coşar, 2.5 kat vurur!
         if (target.CurrentHP < (target.MaxHP / 2))
         {
             baseDamage = (int)(baseDamage * 2.5f);
             System.Diagnostics.Debug.WriteLine($"⚠️ {Name} enjected Vampiric Venom into a weak target! Deadly Damage!");
         }
 
-        // Hasarı vur
         target.TakeDamage(baseDamage);
         return true;
     }
@@ -133,7 +131,6 @@ public class Bat : Enemy
 
 public class EvilWizard : Enemy
 {
-    // 🔥 EVIL WIZARD İÇİN STATİC TEXTURE ALANLARI
     public static Texture2D spriteWizardIdleStatic;
     public static Texture2D spriteWizardAttackStatic;
     public static Texture2D spriteWizardHurtStatic;
@@ -141,7 +138,6 @@ public class EvilWizard : Enemy
 
     public EvilWizard(string name, int hp, int atk, Vector2 pos) : base(name, hp, atk, pos) { }
 
-    // MGCB Editor içindeki büyük/küçük harf durumuna göre (Idle, Attack, Hurt, Death)
     public static void LoadSprites(Microsoft.Xna.Framework.Content.ContentManager content)
     {
         spriteWizardIdleStatic = content.Load<Texture2D>("Characters/EvilWizard/Idle");
@@ -160,14 +156,12 @@ public class EvilWizard : Enemy
 
 public class Sorcerer : Enemy
 {
-    // 🔥 SORCERER İÇİN STATİC TEXTURE ALANLARI
     public static Texture2D spriteSorcererIdleStatic;
     public static Texture2D spriteSorcererAttackStatic;
     public static Texture2D spriteSorcererDeadStatic;
 
     public Sorcerer(string name, int hp, int atk, Vector2 pos) : base(name, hp, atk, pos) { }
 
-    // MGCB Editor'e eklediğin verbatim dosya isimlerine göre yükleme
     public static void LoadSprites(Microsoft.Xna.Framework.Content.ContentManager content)
     {
         spriteSorcererIdleStatic = content.Load<Texture2D>("Characters/Sorcerer/Idle");
@@ -186,7 +180,6 @@ public class Sorcerer : Enemy
 
 public class Zombie : Enemy
 {
-    // 🔥 ZOMBIE İÇİN ORTAK (STATIC) TEXTURE ALANLARI
     public static Texture2D spriteZombieIdleStatic;
     public static Texture2D spriteZombieAttackStatic;
     public static Texture2D spriteZombieHurtStatic;
@@ -194,7 +187,6 @@ public class Zombie : Enemy
 
     public Zombie(string name, int hp, int atk, Vector2 pos) : base(name, hp, atk, pos) { }
 
-    // MGCB Editor'deki dosya isimlerine (Attack_7, Death_8, Hurt_8, Idle_11) göre tam eşleme
     public static void LoadSprites(Microsoft.Xna.Framework.Content.ContentManager content)
     {
         spriteZombieIdleStatic = content.Load<Texture2D>("Characters/Zombie/Idle");
@@ -216,10 +208,39 @@ public class FinalBoss : Enemy
 {
     private int turncount = 0;
 
+    public static List<Texture2D> listBossIdle = new List<Texture2D>();
+    public static List<Texture2D> listBossAttack = new List<Texture2D>();
+    public static List<Texture2D> listBossCast = new List<Texture2D>();
+    public static List<Texture2D> listBossHurt = new List<Texture2D>();
+    public static List<Texture2D> listBossDead = new List<Texture2D>();
+
     public FinalBoss(string name, int hp, int atk, Vector2 pos) : base(name, hp, atk, pos)
     {
         MaxHP = 200;
         CurrentHP = 200;
+    }
+
+    public static void LoadSprites(Microsoft.Xna.Framework.Content.ContentManager content)
+    {
+        listBossIdle.Clear();
+        for (int i = 1; i <= 8; i++)
+            listBossIdle.Add(content.Load<Texture2D>($"Characters/FinalBoss/Bringer-of-Death_Idle_{i}"));
+
+        listBossAttack.Clear();
+        for (int i = 1; i <= 10; i++)
+            listBossAttack.Add(content.Load<Texture2D>($"Characters/FinalBoss/Bringer-of-Death_Attack_{i}"));
+
+        listBossCast.Clear();
+        for (int i = 1; i <= 9; i++)
+            listBossCast.Add(content.Load<Texture2D>($"Characters/FinalBoss/Bringer-of-Death_Cast_{i}"));
+
+        listBossHurt.Clear();
+        for (int i = 1; i <= 3; i++)
+            listBossHurt.Add(content.Load<Texture2D>($"Characters/FinalBoss/Bringer-of-Death_Hurt_{i}"));
+
+        listBossDead.Clear();
+        for (int i = 1; i <= 10; i++)
+            listBossDead.Add(content.Load<Texture2D>($"Characters/FinalBoss/Bringer-of-Death_Death_{i}"));
     }
 
     public override bool ExecuteSkill(int skillIndex, List<Player> allies, List<Enemy> enemies, int targetIndex, bool isultimateunlocked)
@@ -228,7 +249,12 @@ public class FinalBoss : Enemy
 
         if (turncount % 2 == 0)
         {
-            System.Diagnostics.Debug.WriteLine($"{Name} uses METEOR STRIKE! Everyone takes damage!");
+            CurrentState = CharacterState.Attack2;
+            currentFrame = 0;
+            animationTimer = 0f;
+            System.Diagnostics.Debug.WriteLine($"{Name} uses VOID BLAST on {allies[targetIndex].Name}!");
+
+
             foreach (var player in allies)
             {
                 player.TakeDamage(Attackpower - 5);
@@ -236,7 +262,12 @@ public class FinalBoss : Enemy
         }
         else
         {
-            System.Diagnostics.Debug.WriteLine($"{Name} uses VOID BLAST on {allies[targetIndex].Name}!");
+            CurrentState = CharacterState.Attack;
+            currentFrame = 0;
+            animationTimer = 0f;
+
+
+            System.Diagnostics.Debug.WriteLine($"{Name} uses METEOR STRIKE! Everyone takes damage!");
             allies[targetIndex].TakeDamage(Attackpower);
         }
 
