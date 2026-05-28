@@ -233,7 +233,7 @@ public class Player : BaseCharacter
         public override bool ExecuteSkill(int skillIndex, List<Player> allies, List<Enemy> enemies, int targetIndex, bool isultimateunlocked)
         {
             int skill1manacost = 0;
-            int skill2manacost = 20;
+            int skill2manacost = 10;
             int skill3manacost = 0;
             int skill4manacost = 30;
 

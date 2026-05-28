@@ -162,8 +162,25 @@ public class Game1 : Game
 
         if (currentState == BattleState.GameOver || currentState == BattleState.Victory)
         {
+            if (currentState == BattleState.GameOver && kstate.IsKeyDown(Keys.R) && oldState.IsKeyUp(Keys.R))
+            {
+                currentWave = 1;
+                activeunitindex = 0;
+                enemyIndex = 0;
+                selectedskillind = 0;
+                selectedtargetind = 0;
+                isskillselected = false;
 
+                allies.Clear();
+                enemies.Clear();
+
+                Initialize();
+
+                currentState = BattleState.PlayerTurn;
+            }
             return;
+
+
         }
 
         if (enemies.Count == 0)
@@ -605,34 +622,117 @@ public class Game1 : Game
                 _spriteBatch.End();
                 return;
             }
-            Vector2 pPos = allies[activeunitindex].Position;
 
-            for (int i = 0; i < 4; i++)
+            var currentPlayer = allies[activeunitindex];
+            List<SkillInfo> currentSkills = new List<SkillInfo>();
+
+            if (currentPlayer.Name == "Leroy")
             {
-                Color boxColor = (selectedskillind == i) ? Color.Gold : Color.Gray * 0.6f;
-
-                int offsetX = 0;
-                int offsetY = -180;
-
-                if (activeunitindex == 2)
-                {
-                    offsetX = 20;
-                }
-                else if (activeunitindex == 1)
-                {
-                    offsetX = 60;
-                }
-                else if (activeunitindex == 0)
-                {
-                    offsetX = 10;
-                }
-
-                Rectangle skillBox = new Rectangle((int)pPos.X + offsetX, (int)pPos.Y + offsetY + (i * 40), 50, 30);
-
-                _spriteBatch.Draw(pixel, skillBox, boxColor);
+                currentSkills.Add(new SkillInfo("1. Sword Attack", $"{currentPlayer.Attackpower} DMG", "0 MP", "Gains 10 MP."));
+                currentSkills.Add(new SkillInfo("2. Double Trouble", $"{currentPlayer.Attackpower * 2} DMG", "15 MP", "Deal 2x DMG, take 2x DMG."));
+                currentSkills.Add(new SkillInfo("3. Sword Rain", $"{currentPlayer.Attackpower} AOE", "10 MP", "Blasts all enemies with a sword Rain."));
+                currentSkills.Add(new SkillInfo("4. Guardian Stance", "0 DMG", "10 MP", "Enters stance. Cuts incoming DMG by 4."));
+            }
+            else if (currentPlayer.Name == "Renato")
+            {
+                currentSkills.Add(new SkillInfo("1. Quick Slash", $"{currentPlayer.Attackpower} DMG", "0 MP", "Gains 10 MP"));
+                currentSkills.Add(new SkillInfo("2. Holy Heal", "30 HEAL", "15 MP", "Restores HP to an ally."));
+                currentSkills.Add(new SkillInfo("3. Moonlight Power", "0 DMG", "20 MP", "Gives ATK Power buff to all allies."));
+                currentSkills.Add(new SkillInfo("4. Final Sacrifice", "INSTANT KILL", "30 MP", "Kills single target, but Sacrifices himself."));
+            }
+            else if (currentPlayer.Name == "Yaser")
+            {
+                currentSkills.Add(new SkillInfo("1. Basic Attack", $"{currentPlayer.Attackpower} DMG", "0 MP", "Gains 10 MP on hit."));
+                currentSkills.Add(new SkillInfo("2. Chain Lightning", "30 SPLIT", "10 MP", "Deals 30 DMG split among all living enemies."));
+                currentSkills.Add(new SkillInfo("3. Mana Battery", "+30 MANA", "0 MP", "Gives 30 MP to an ally. Cost: 0 MP."));
+                currentSkills.Add(new SkillInfo("4. Void Apocalypse", "ALL MP DMG", "30 MP", "Consumes ALL MP. Deals DMG equal to spent MP."));
             }
 
+            int menuWidth = 400;
+            int menuHeight = currentSkills.Count * 45 + 10;
 
+            int menuX = (int)currentPlayer.Position.X + 25 - (menuWidth / 2);
+            int menuY = (int)currentPlayer.Position.Y - menuHeight - 60;
+
+            if (menuX < 10) menuX = 10;
+            if (menuY < 10) menuY = 10;
+
+            _spriteBatch.Draw(pixel, new Rectangle(menuX - 2, menuY - 2, menuWidth + 4, menuHeight + 4), Color.Black);
+            _spriteBatch.Draw(pixel, new Rectangle(menuX, menuY, menuWidth, menuHeight), Color.Black * 0.8f);
+
+            for (int i = 0; i < currentSkills.Count; i++)
+            {
+                bool isSelected = (selectedskillind == i);
+                Color titleColor = isSelected ? Color.Gold : Color.White;
+                Color boxColor = isSelected ? Color.Gold * 0.25f : Color.Transparent;
+
+                int slotX = menuX + 15;
+                int slotY = menuY + 8 + (i * 45);
+
+                if (isSelected)
+                {
+                    _spriteBatch.Draw(pixel, new Rectangle(menuX + 4, slotY - 4, menuWidth - 8, 40), boxColor);
+                    _spriteBatch.Draw(pixel, new Rectangle(menuX + 4, slotY - 4, 3, 40), Color.Gold);
+                }
+
+                string skillTitle = currentSkills[i].Name;
+                string statsText = $" [{currentSkills[i].DamageText}] [{currentSkills[i].CostText}]";
+
+                _spriteBatch.DrawString(gameFont, skillTitle, new Vector2(slotX + 1, slotY + 1), Color.Black);
+                _spriteBatch.DrawString(gameFont, skillTitle, new Vector2(slotX, slotY), titleColor);
+
+                Vector2 titleSize = gameFont.MeasureString(skillTitle);
+                _spriteBatch.DrawString(gameFont, statsText, new Vector2(slotX + titleSize.X + 11, slotY + 1), Color.Black);
+                _spriteBatch.DrawString(gameFont, statsText, new Vector2(slotX + titleSize.X + 10, slotY), isSelected ? Color.Cyan : Color.LightGray);
+
+                string desc = currentSkills[i].Description;
+                _spriteBatch.DrawString(gameFont, desc, new Vector2(slotX + 1, slotY + 21), Color.Black, 0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0f);
+                _spriteBatch.DrawString(gameFont, desc, new Vector2(slotX, slotY + 20), Color.DarkGray, 0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0f);
+            }
+        }
+
+        if (currentState == BattleState.GameOver)
+        {
+            Rectangle screenBounds = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+
+            _spriteBatch.Draw(pixel, screenBounds, Color.Black * 0.65f);
+            _spriteBatch.Draw(pixel, screenBounds, Color.Red * 0.08f);
+
+            string goText = "GAME OVER";
+            Vector2 goSize = gameFont.MeasureString(goText) * 2.5f;
+            Vector2 goPos = new Vector2(GraphicsDevice.Viewport.Width / 2 - goSize.X / 2, GraphicsDevice.Viewport.Height / 2 - goSize.Y / 2 - 30);
+
+            _spriteBatch.DrawString(gameFont, goText, new Vector2(goPos.X + 3, goPos.Y + 3), Color.Black, 0f, Vector2.Zero, 2.5f, SpriteEffects.None, 0f);
+            _spriteBatch.DrawString(gameFont, goText, goPos, Color.Crimson, 0f, Vector2.Zero, 2.5f, SpriteEffects.None, 0f);
+
+            string restartText = "Press [ R ] to Retry the Battle";
+            Vector2 restartSize = gameFont.MeasureString(restartText) * 0.9f;
+            Vector2 restartPos = new Vector2(GraphicsDevice.Viewport.Width / 2 - restartSize.X / 2, goPos.Y + goSize.Y + 20);
+
+            _spriteBatch.DrawString(gameFont, restartText, new Vector2(restartPos.X + 1, restartPos.Y + 1), Color.Black, 0f, Vector2.Zero, 0.9f, SpriteEffects.None, 0f);
+            _spriteBatch.DrawString(gameFont, restartText, restartPos, Color.LightGray, 0f, Vector2.Zero, 0.9f, SpriteEffects.None, 0f);
+        }
+
+        if (currentState == BattleState.Victory)
+        {
+            Rectangle screenBounds = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+
+            _spriteBatch.Draw(pixel, screenBounds, Color.Black * 0.6f);
+            _spriteBatch.Draw(pixel, screenBounds, Color.Gold * 0.05f);
+
+            string vicText = "VICTORY";
+            Vector2 vicSize = gameFont.MeasureString(vicText) * 2.5f;
+            Vector2 vicPos = new Vector2(GraphicsDevice.Viewport.Width / 2 - vicSize.X / 2, GraphicsDevice.Viewport.Height / 2 - vicSize.Y / 2 - 30);
+
+            _spriteBatch.DrawString(gameFont, vicText, new Vector2(vicPos.X + 3, vicPos.Y + 3), Color.Black, 0f, Vector2.Zero, 2.5f, SpriteEffects.None, 0f);
+            _spriteBatch.DrawString(gameFont, vicText, vicPos, Color.Gold, 0f, Vector2.Zero, 2.5f, SpriteEffects.None, 0f);
+
+            string congraText = "You have cleansed the battlefield!";
+            Vector2 congraSize = gameFont.MeasureString(congraText) * 0.9f;
+            Vector2 congraPos = new Vector2(GraphicsDevice.Viewport.Width / 2 - congraSize.X / 2, vicPos.Y + vicSize.Y + 20);
+
+            _spriteBatch.DrawString(gameFont, congraText, new Vector2(congraPos.X + 1, congraPos.Y + 1), Color.Black, 0f, Vector2.Zero, 0.9f, SpriteEffects.None, 0f);
+            _spriteBatch.DrawString(gameFont, congraText, congraPos, Color.White, 0f, Vector2.Zero, 0.9f, SpriteEffects.None, 0f);
         }
 
         _spriteBatch.End();
