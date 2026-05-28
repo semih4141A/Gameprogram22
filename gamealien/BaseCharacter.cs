@@ -15,6 +15,8 @@ public class BaseCharacter
     public int currentFrame = 0;
     public float FrameTime { get; set; } = 0.15f;
 
+    public float Scale { get; set; } = 1f;
+
     public int frameCountIdle = 4;
     public int frameCountAttack = 5;
     public int frameCountDefend = 5;
@@ -329,7 +331,7 @@ public class BaseCharacter
 
                 if (Name == "Yaser" || this is Vampire || this is Skeleton || this is Bat || this is EvilWizard || this is Sorcerer || this is Zombie || this is FinalBoss)
                 {
-                    if ((CurrentState == CharacterState.Attack || CurrentState == CharacterState.Hurt) && currentFrame >= frameCount)
+                    if ((CurrentState == CharacterState.Attack || CurrentState == CharacterState.Attack2 || CurrentState == CharacterState.Hurt) && currentFrame >= frameCount)
                     {
                         CurrentState = CharacterState.Idle;
                         currentFrame = 0;
@@ -406,7 +408,10 @@ public class BaseCharacter
 
             if (singleFrameTexture != null)
             {
-                Rectangle destRectBoss = new Rectangle((int)Position.X, (int)Position.Y, singleFrameTexture.Width, singleFrameTexture.Height);
+                int bossWidth = (int)(singleFrameTexture.Width * Scale);
+                int bossHeight = (int)(singleFrameTexture.Height * Scale);
+
+                Rectangle destRectBoss = new Rectangle((int)Position.X, (int)Position.Y, bossWidth, bossHeight);
                 spriteBatch.Draw(singleFrameTexture, destRectBoss, null, Color.White, 0f, Vector2.Zero, SpriteEffects.None, 0f);
             }
             return;
@@ -656,9 +661,8 @@ public class BaseCharacter
             if (currentY + frameHeight > currentTexture.Height) currentY = currentTexture.Height - frameHeight;
 
             Rectangle sourceRect = new Rectangle(currentX, currentY, frameWidth, frameHeight);
-            int finalRenderWidth = frameWidth;
-            int finalRenderHeight = frameHeight;
-
+            int finalRenderWidth = (int)(frameWidth * Scale);
+            int finalRenderHeight = (int)(frameHeight * Scale);
             if (Name == "Renato")
             {
                 finalRenderWidth = (int)(frameWidth * 1.35f);

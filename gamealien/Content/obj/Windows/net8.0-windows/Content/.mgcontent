@@ -4,6 +4,10 @@
   <Platform>Windows</Platform>
   <Config />
   <SourceFiles>
+    <File>c:/Users/erens/Desktop/Create With Code/Board game/Gameprogram22/gamealien/Content/Backgrounds/Battleground1.png</File>
+    <File>c:/Users/erens/Desktop/Create With Code/Board game/Gameprogram22/gamealien/Content/Backgrounds/Battleground2.png</File>
+    <File>c:/Users/erens/Desktop/Create With Code/Board game/Gameprogram22/gamealien/Content/Backgrounds/Battleground3.png</File>
+    <File>c:/Users/erens/Desktop/Create With Code/Board game/Gameprogram22/gamealien/Content/Backgrounds/Battleground4.png</File>
     <File>c:/Users/erens/Desktop/Create With Code/Board game/Gameprogram22/gamealien/Content/Characters/Bat/attack.png</File>
     <File>c:/Users/erens/Desktop/Create With Code/Board game/Gameprogram22/gamealien/Content/Characters/Bat/death.png</File>
     <File>c:/Users/erens/Desktop/Create With Code/Board game/Gameprogram22/gamealien/Content/Characters/Bat/hurt.png</File>
@@ -94,6 +98,10 @@
     <File>c:/Users/erens/Desktop/Create With Code/Board game/Gameprogram22/gamealien/Content/File.spritefont</File>
   </SourceFiles>
   <DestFiles>
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />

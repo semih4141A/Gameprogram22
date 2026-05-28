@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -15,6 +16,8 @@ public class Game1 : Game
 
     List<Player> allies = new List<Player>();
     List<Enemy> enemies = new List<Enemy>();
+
+    List<Texture2D> battlegrounds = new List<Texture2D>();
 
     enum BattleState { PlayerTurn, EnemyTurn, GameOver, Victory }
     BattleState currentState = BattleState.PlayerTurn;
@@ -46,13 +49,17 @@ public class Game1 : Game
 
     protected override void Initialize()
     {
-        allies.Add(new Player.Leroy("Leroy", 100, 60, 999, new Vector2(300, 215)));
-        allies.Add(new Player.Renato("Renato", 70, 60, 15, new Vector2(150, 215)));
-        allies.Add(new Player.Yaser("Yaser", 70, 60, 20, new Vector2(0, 160)));
+        allies.Add(new Player.Leroy("Leroy", 100, 60, 999, new Vector2(300, 255)));
+        allies.Add(new Player.Renato("Renato", 70, 60, 15, new Vector2(150, 255)));
+        allies.Add(new Player.Yaser("Yaser", 70, 60, 20, new Vector2(0, 200)));
 
-        enemies.Add(new Vampire("Vampire", 60, 10, new Vector2(450, 175)));
-        enemies.Add(new Skeleton("Skeleton", 40, 15, new Vector2(550, 200)));
-        enemies.Add(new Vampire("Vampire", 60, 10, new Vector2(650, 175)));
+        var v1 = new Vampire("Vampire", 60, 10, new Vector2(450, 215)) { UIIndex = 0 };
+        var s1 = new Skeleton("Skeleton", 40, 15, new Vector2(510, 200)) { UIIndex = 1 };
+        var v2 = new Vampire("Vampire", 60, 10, new Vector2(650, 215)) { UIIndex = 2 };
+
+        enemies.Add(v1);
+        enemies.Add(s1);
+        enemies.Add(v2);
 
         base.Initialize();
     }
@@ -63,6 +70,10 @@ public class Game1 : Game
         gameFont = Content.Load<SpriteFont>("GameFont");
 
         pixel = new Texture2D(GraphicsDevice, 1, 1);
+        battlegrounds.Add(Content.Load<Texture2D>("Backgrounds/Battleground1"));
+        battlegrounds.Add(Content.Load<Texture2D>("Backgrounds/Battleground2"));
+        battlegrounds.Add(Content.Load<Texture2D>("Backgrounds/Battleground3"));
+        battlegrounds.Add(Content.Load<Texture2D>("Backgrounds/Battleground4"));
         pixel.SetData(new[] { Color.White });
 
         var leroy = allies.Find(a => a.Name == "Leroy");
@@ -165,23 +176,24 @@ public class Game1 : Game
             if (currentWave == 3) isYaserUltimateUnlocked = true;
             if (currentWave == 4) isLeroyUltimateUnlocked = true;
 
+
             if (currentWave == 2)
             {
-                enemies.Add(new Zombie("Zombie", 60, 10, new Vector2(500, 200)));
-                enemies.Add(new Bat("Bat", 80, 15, new Vector2(580, 200)));
-                enemies.Add(new Zombie("Zombie", 60, 10, new Vector2(660, 200)));
+                enemies.Add(new Zombie("Zombie", 60, 10, new Vector2(470, 240)) { UIIndex = 0 });
+                enemies.Add(new Bat("Bat", 80, 15, new Vector2(550, 240)) { UIIndex = 1 });
+                enemies.Add(new Zombie("Zombie", 60, 10, new Vector2(620, 240)) { UIIndex = 2 });
             }
             else if (currentWave == 3)
             {
-                enemies.Add(new EvilWizard("EvilWizard", 50, 20, new Vector2(500, 200)));
-                enemies.Add(new Sorcerer("Sorcerer", 50, 5, new Vector2(580, 200)));
-                enemies.Add(new EvilWizard("EvilWizard", 50, 20, new Vector2(660, 200)));
+                enemies.Add(new EvilWizard("EvilWizard", 50, 20, new Vector2(350, 120)) { UIIndex = 0 });
+                enemies.Add(new Sorcerer("Sorcerer", 50, 5, new Vector2(520, 220)) { UIIndex = 1 });
+                enemies.Add(new EvilWizard("EvilWizard", 50, 20, new Vector2(520, 120)) { UIIndex = 2 });
             }
             else if (currentWave == 4)
             {
-                enemies.Add(new FinalBoss("FinalBoss", 200, 30, new Vector2(580, 200)));
-                enemies.Add(new EvilWizard("EvilWizard", 50, 20, new Vector2(500, 200)));
-                enemies.Add(new Sorcerer("Sorcerer", 50, 5, new Vector2(660, 200)));
+                enemies.Add(new FinalBoss("FinalBoss", 200, 30, new Vector2(370, 215)) { UIIndex = 0 });
+                enemies.Add(new EvilWizard("EvilWizard", 50, 20, new Vector2(450, 120)) { UIIndex = 1 });
+                enemies.Add(new Sorcerer("Sorcerer", 50, 5, new Vector2(600, 220)) { UIIndex = 2 });
             }
 
             foreach (var e in enemies) e.Sprite = pixel;
@@ -199,29 +211,53 @@ public class Game1 : Game
             if (!isskillselected)
             {
                 if (kstate.IsKeyDown(Keys.Enter) && oldState.IsKeyUp(Keys.Enter))
+                {
                     isskillselected = true;
+                    selectedtargetind = 0;
+                }
             }
             else
             {
-                bool isFriendlyTarget = false;
-                if (activeunitindex == 1 && (selectedskillind == 1 || selectedskillind == 2)) isFriendlyTarget = true;
-                if (activeunitindex == 2 && selectedskillind == 2) isFriendlyTarget = true;
+                bool isFriendlyTarget = (activeunitindex == 1 && (selectedskillind == 1 || selectedskillind == 2)) ||
+                                        (activeunitindex == 2 && selectedskillind == 2);
+
+                if (isFriendlyTarget)
+                    selectedtargetind = MathHelper.Clamp(selectedtargetind, 0, Math.Max(0, allies.Count - 1));
+                else
+                    selectedtargetind = MathHelper.Clamp(selectedtargetind, 0, Math.Max(0, enemies.Count - 1));
 
                 if (isFriendlyTarget)
                 {
-                    if (kstate.IsKeyDown(Keys.Left) && oldState.IsKeyUp(Keys.Left)) selectedtargetind++;
-                    if (kstate.IsKeyDown(Keys.Right) && oldState.IsKeyUp(Keys.Right)) selectedtargetind--;
+                    if (kstate.IsKeyDown(Keys.Left) && oldState.IsKeyUp(Keys.Left))
+                    {
+                        selectedtargetind++;
+                        if (selectedtargetind >= allies.Count) selectedtargetind = 0;
+                    }
+                    if (kstate.IsKeyDown(Keys.Right) && oldState.IsKeyUp(Keys.Right))
+                    {
+                        selectedtargetind--;
+                        if (selectedtargetind < 0) selectedtargetind = allies.Count - 1;
+                    }
 
                     selectedtargetind = MathHelper.Clamp(selectedtargetind, 0, allies.Count - 1);
-
                 }
-
                 else
                 {
-                    if (kstate.IsKeyDown(Keys.Left) && oldState.IsKeyUp(Keys.Left)) selectedtargetind--;
-                    if (kstate.IsKeyDown(Keys.Right) && oldState.IsKeyUp(Keys.Right)) selectedtargetind++;
+                    if (kstate.IsKeyDown(Keys.Left) && oldState.IsKeyUp(Keys.Left))
+                    {
+                        selectedtargetind--;
+                        if (selectedtargetind < 0) selectedtargetind = enemies.Count - 1;
+                    }
+                    if (kstate.IsKeyDown(Keys.Right) && oldState.IsKeyUp(Keys.Right))
+                    {
+                        selectedtargetind++;
+                        if (selectedtargetind >= enemies.Count) selectedtargetind = 0;
+                    }
 
-                    selectedtargetind = MathHelper.Clamp(selectedtargetind, 0, enemies.Count - 1);
+                    if (enemies.Count > 0)
+                        selectedtargetind = MathHelper.Clamp(selectedtargetind, 0, enemies.Count - 1);
+                    else
+                        selectedtargetind = 0;
                 }
 
 
@@ -403,18 +439,26 @@ public class Game1 : Game
             if (activeunitindex >= allies.Count && allies.Count > 0) activeunitindex = allies.Count - 1;
             if (activeunitindex < 0) activeunitindex = 0;
 
-            if (enemies.Count > 0)
+            bool currentIsFriendlyTarget = isskillselected && (
+                (activeunitindex == 1 && (selectedskillind == 1 || selectedskillind == 2)) ||
+                (activeunitindex == 2 && selectedskillind == 2)
+            );
+
+            if (currentIsFriendlyTarget)
             {
-                if (selectedtargetind >= enemies.Count)
-                {
-                    selectedtargetind = enemies.Count - 1;
-                }
+                selectedtargetind = MathHelper.Clamp(selectedtargetind, 0, Math.Max(0, allies.Count - 1));
             }
             else
             {
-                selectedtargetind = 0;
+                if (enemies.Count > 0)
+                {
+                    selectedtargetind = MathHelper.Clamp(selectedtargetind, 0, enemies.Count - 1);
+                }
+                else
+                {
+                    selectedtargetind = 0;
+                }
             }
-            if (selectedtargetind < 0) selectedtargetind = 0;
         }
 
         if (enemies.Count == 0 && currentWave == 4)
@@ -430,33 +474,59 @@ public class Game1 : Game
     {
         int bX = (int)position.X;
         int bY = (int)position.Y;
+        int bWidth = 50;
+        int bHeight = 6;
 
-        _spriteBatch.Draw(pixel, new Rectangle(bX, bY, 50, 6), Color.Red);
+        _spriteBatch.Draw(pixel, new Rectangle(bX - 1, bY - 1, bWidth + 2, bHeight + 2), Color.Black);
+
+        _spriteBatch.Draw(pixel, new Rectangle(bX, bY, bWidth, bHeight), Color.Red);
 
         float healthPercent = (float)currentHP / maxHP;
-        _spriteBatch.Draw(pixel, new Rectangle(bX, bY, (int)(50 * healthPercent), 6), Color.Green);
+        _spriteBatch.Draw(pixel, new Rectangle(bX, bY, (int)(bWidth * healthPercent), bHeight), Color.LimeGreen);
 
         string hpText = $"{currentHP}/{maxHP}";
-        _spriteBatch.DrawString(gameFont, hpText, new Vector2(bX + 55, bY), Color.White, 0, Vector2.Zero, 0.5f, SpriteEffects.None, 0);
+        Vector2 textPos = new Vector2(bX + 55, bY - 2);
+
+        _spriteBatch.DrawString(gameFont, hpText, new Vector2(textPos.X + 1, textPos.Y + 1), Color.Black, 0, Vector2.Zero, 0.5f, SpriteEffects.None, 0);
+        _spriteBatch.DrawString(gameFont, hpText, textPos, Color.White, 0, Vector2.Zero, 0.5f, SpriteEffects.None, 0);
     }
 
     private void DrawManaBar(Vector2 position, int currentMP, int maxMP)
     {
         int bX = (int)position.X;
-        int bY = (int)position.Y + 10;
+        int bY = (int)position.Y + 12;
+        int bWidth = 50;
+        int bHeight = 4;
 
-        _spriteBatch.Draw(pixel, new Rectangle(bX, bY, 50, 4), Color.Black * 0.5f);
+        _spriteBatch.Draw(pixel, new Rectangle(bX - 1, bY - 1, bWidth + 2, bHeight + 2), Color.Black);
+
+        _spriteBatch.Draw(pixel, new Rectangle(bX, bY, bWidth, bHeight), Color.Black * 0.5f);
 
         float manaPercent = (float)currentMP / maxMP;
-        _spriteBatch.Draw(pixel, new Rectangle(bX, bY, (int)(50 * manaPercent), 4), Color.DeepSkyBlue);
+        _spriteBatch.Draw(pixel, new Rectangle(bX, bY, (int)(bWidth * manaPercent), bHeight), Color.Cyan);
 
         string mpText = $"{currentMP}/{maxMP}";
-        _spriteBatch.DrawString(gameFont, mpText, new Vector2(bX + 55, bY - 4), Color.Cyan, 0, Vector2.Zero, 0.6f, SpriteEffects.None, 0);
+        Vector2 textPos = new Vector2(bX + 55, bY - 4);
+
+        _spriteBatch.DrawString(gameFont, mpText, new Vector2(textPos.X + 1, textPos.Y + 1), Color.Black, 0, Vector2.Zero, 0.55f, SpriteEffects.None, 0);
+        _spriteBatch.DrawString(gameFont, mpText, textPos, Color.DeepSkyBlue, 0, Vector2.Zero, 0.55f, SpriteEffects.None, 0);
     }
     protected override void Draw(GameTime gameTime)
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
         _spriteBatch.Begin();
+        int bgIndex = currentWave - 1;
+
+        if (bgIndex >= battlegrounds.Count)
+        {
+            bgIndex = battlegrounds.Count - 1;
+        }
+
+        if (battlegrounds.Count > 0 && bgIndex >= 0)
+        {
+            Rectangle screenBounds = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+            _spriteBatch.Draw(battlegrounds[bgIndex], screenBounds, Color.White);
+        }
 
         for (int i = 0; i < allies.Count; i++)
         {
@@ -470,7 +540,7 @@ public class Game1 : Game
             allies[i].Draw(_spriteBatch, c, gameFont);
 
             int barX = 0;
-            int barY = 200;
+            int barY = 240;
 
             if (allies[i].Name == "Yaser") barX = 75;
             if (allies[i].Name == "Renato") barX = 210;
@@ -481,7 +551,24 @@ public class Game1 : Game
             string name = allies[i].Name;
             Vector2 nameSize = gameFont.MeasureString(name);
             Vector2 namePos = new Vector2(uiPos.X + (50 / 2) - (nameSize.X / 2), uiPos.Y - 20);
-            _spriteBatch.DrawString(gameFont, name, namePos, Color.White);
+
+            Color nameColor;
+
+            if (isTargeted)
+            {
+                nameColor = Color.LimeGreen;
+            }
+            else if (i == activeunitindex)
+            {
+                nameColor = Color.Gold;
+            }
+            else
+            {
+                nameColor = Color.White;
+            }
+
+            _spriteBatch.DrawString(gameFont, name, new Vector2(namePos.X + 1, namePos.Y + 1), Color.Black);
+            _spriteBatch.DrawString(gameFont, name, namePos, nameColor);
 
             DrawHealthBar(uiPos, allies[i].CurrentHP, allies[i].MaxHP);
             DrawManaBar(uiPos, allies[i].CurrentMP, allies[i].MaxMP);
@@ -497,13 +584,16 @@ public class Game1 : Game
             Color c = isTargeted ? Color.Yellow : Color.Red;
             enemies[i].Draw(_spriteBatch, c, gameFont);
 
-            int enemyUiX = 500 + (i * 80);
-            int enemyUiY = 190;
+            int enemyUiX = 500 + (enemies[i].UIIndex * 80);
+            int enemyUiY = 230;
 
             string enemyName = enemies[i].Name;
             Vector2 enemyNameSize = gameFont.MeasureString(enemyName);
             Vector2 enemyNamePos = new Vector2(enemyUiX + (50 / 2) - (enemyNameSize.X / 2), enemyUiY - 10);
-            _spriteBatch.DrawString(gameFont, enemyName, enemyNamePos, Color.White);
+
+            Color enemyNameColor = isTargeted ? Color.Yellow : Color.IndianRed;
+            _spriteBatch.DrawString(gameFont, enemyName, new Vector2(enemyNamePos.X + 1, enemyNamePos.Y + 1), Color.Black);
+            _spriteBatch.DrawString(gameFont, enemyName, enemyNamePos, enemyNameColor);
 
             DrawHealthBar(new Vector2(enemyUiX, enemyUiY + 20), enemies[i].CurrentHP, enemies[i].MaxHP);
         }
@@ -542,23 +632,7 @@ public class Game1 : Game
                 _spriteBatch.Draw(pixel, skillBox, boxColor);
             }
 
-            if (isskillselected)
-            {
-                bool isFriendlyTarget = (activeunitindex == 1 && (selectedskillind == 1 || selectedskillind == 2)) ||
-                                        (activeunitindex == 2 && selectedskillind == 2);
 
-
-                if (isFriendlyTarget && selectedtargetind < allies.Count && selectedtargetind >= 0)
-                {
-                    Vector2 targetPos = allies[selectedtargetind].Position;
-                    _spriteBatch.Draw(pixel, new Rectangle((int)targetPos.X, (int)targetPos.Y + 100, 40, 10), Color.Yellow);
-                }
-                else if (!isFriendlyTarget && selectedtargetind < enemies.Count && selectedtargetind >= 0)
-                {
-                    Vector2 targetPos = enemies[selectedtargetind].Position;
-                    _spriteBatch.Draw(pixel, new Rectangle((int)targetPos.X, (int)targetPos.Y + 100, 40, 10), Color.Yellow);
-                }
-            }
         }
 
         _spriteBatch.End();

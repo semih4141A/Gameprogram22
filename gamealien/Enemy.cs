@@ -6,6 +6,7 @@ using SharpDX.DXGI;
 
 public class Enemy : BaseCharacter
 {
+    public int UIIndex { get; set; }
     public Enemy(string name, int hp, int atk, Vector2 pos) : base(name, hp, atk, pos) { }
 
     public void TakeTurn(List<Player> allies, List<Enemy> enemies)
@@ -78,7 +79,10 @@ public class Skeleton : Enemy
     public static Texture2D spriteSkeletonHurtStatic;
     public static Texture2D spriteSkeletonDeadStatic;
 
-    public Skeleton(string name, int hp, int atk, Vector2 pos) : base(name, hp, atk, pos) { }
+    public Skeleton(string name, int hp, int atk, Vector2 pos) : base(name, hp, atk, pos)
+    {
+        Scale = 1.5f;
+    }
 
     public static void LoadSprites(Microsoft.Xna.Framework.Content.ContentManager content)
     {
@@ -103,7 +107,10 @@ public class Bat : Enemy
     public static Texture2D spriteBatHurtStatic;
     public static Texture2D spriteBatDeadStatic;
 
-    public Bat(string name, int hp, int atk, Vector2 pos) : base(name, hp, atk, pos) { }
+    public Bat(string name, int hp, int atk, Vector2 pos) : base(name, hp, atk, pos)
+    {
+        Scale = 1.3f;
+    }
 
     public static void LoadSprites(Microsoft.Xna.Framework.Content.ContentManager content)
     {
@@ -136,7 +143,10 @@ public class EvilWizard : Enemy
     public static Texture2D spriteWizardHurtStatic;
     public static Texture2D spriteWizardDeadStatic;
 
-    public EvilWizard(string name, int hp, int atk, Vector2 pos) : base(name, hp, atk, pos) { }
+    public EvilWizard(string name, int hp, int atk, Vector2 pos) : base(name, hp, atk, pos)
+    {
+        Scale = 1.4f;
+    }
 
     public static void LoadSprites(Microsoft.Xna.Framework.Content.ContentManager content)
     {
@@ -160,7 +170,10 @@ public class Sorcerer : Enemy
     public static Texture2D spriteSorcererAttackStatic;
     public static Texture2D spriteSorcererDeadStatic;
 
-    public Sorcerer(string name, int hp, int atk, Vector2 pos) : base(name, hp, atk, pos) { }
+    public Sorcerer(string name, int hp, int atk, Vector2 pos) : base(name, hp, atk, pos)
+    {
+        Scale = 0.8f;
+    }
 
     public static void LoadSprites(Microsoft.Xna.Framework.Content.ContentManager content)
     {
@@ -185,7 +198,10 @@ public class Zombie : Enemy
     public static Texture2D spriteZombieHurtStatic;
     public static Texture2D spriteZombieDeadStatic;
 
-    public Zombie(string name, int hp, int atk, Vector2 pos) : base(name, hp, atk, pos) { }
+    public Zombie(string name, int hp, int atk, Vector2 pos) : base(name, hp, atk, pos)
+    {
+        Scale = 2.0f;
+    }
 
     public static void LoadSprites(Microsoft.Xna.Framework.Content.ContentManager content)
     {
@@ -218,6 +234,8 @@ public class FinalBoss : Enemy
     {
         MaxHP = 200;
         CurrentHP = 200;
+
+        Scale = 1.5f;
     }
 
     public static void LoadSprites(Microsoft.Xna.Framework.Content.ContentManager content)
