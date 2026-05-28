@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\erens\\Desktop\\Create With Code\\Board game\\Gameprogram22\\gamealien\\gamealien.csproj": {}
+    "C:\\Users\\erens\\Desktop\\Create With Code\\Board game\\Gameprogram22\\gamealien\\gamealien.csproj": {}
   },
   "projects": {
-    "c:\\Users\\erens\\Desktop\\Create With Code\\Board game\\Gameprogram22\\gamealien\\gamealien.csproj": {
+    "C:\\Users\\erens\\Desktop\\Create With Code\\Board game\\Gameprogram22\\gamealien\\gamealien.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\erens\\Desktop\\Create With Code\\Board game\\Gameprogram22\\gamealien\\gamealien.csproj",
+        "projectUniqueName": "C:\\Users\\erens\\Desktop\\Create With Code\\Board game\\Gameprogram22\\gamealien\\gamealien.csproj",
         "projectName": "gamealien",
-        "projectPath": "c:\\Users\\erens\\Desktop\\Create With Code\\Board game\\Gameprogram22\\gamealien\\gamealien.csproj",
+        "projectPath": "C:\\Users\\erens\\Desktop\\Create With Code\\Board game\\Gameprogram22\\gamealien\\gamealien.csproj",
         "packagesPath": "C:\\Users\\erens\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\erens\\Desktop\\Create With Code\\Board game\\Gameprogram22\\gamealien\\obj\\",
+        "outputPath": "C:\\Users\\erens\\Desktop\\Create With Code\\Board game\\Gameprogram22\\gamealien\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\erens\\AppData\\Roaming\\NuGet\\NuGet.Config"
