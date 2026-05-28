@@ -19,8 +19,11 @@ public class Game1 : Game
 
     List<Texture2D> battlegrounds = new List<Texture2D>();
 
-    enum BattleState { PlayerTurn, EnemyTurn, GameOver, Victory }
-    BattleState currentState = BattleState.PlayerTurn;
+    enum BattleState { PlayerTurn, MainMenu, EnemyTurn, GameOver, Victory }
+
+    BattleState currentState = BattleState.MainMenu;
+
+    int menuIndex = 0;
     int activeunitindex = 0;
 
     int currentWave = 1;
@@ -149,6 +152,54 @@ public class Game1 : Game
     protected override void Update(GameTime gameTime)
     {
         var kstate = Keyboard.GetState();
+
+        if (currentState == BattleState.MainMenu)
+        {
+            if (kstate.IsKeyDown(Keys.Up) && oldState.IsKeyUp(Keys.Up)) menuIndex = 0;
+            if (kstate.IsKeyDown(Keys.Down) && oldState.IsKeyUp(Keys.Down)) menuIndex = 1;
+
+            if (kstate.IsKeyDown(Keys.Enter) && oldState.IsKeyUp(Keys.Enter))
+            {
+                if (menuIndex == 0)
+                {
+                    ResetWholeGame();
+                    currentState = BattleState.PlayerTurn;
+                }
+                else if (menuIndex == 1)
+                {
+                    Exit();
+                }
+            }
+
+            oldState = kstate;
+            base.Update(gameTime);
+            return;
+        }
+
+        if (currentState == BattleState.GameOver || currentState == BattleState.Victory)
+        {
+            if (currentState == BattleState.GameOver)
+            {
+                if (kstate.IsKeyDown(Keys.R) && oldState.IsKeyUp(Keys.R))
+                {
+                    ResetWholeGame();
+                    currentState = BattleState.PlayerTurn;
+                }
+                if (kstate.IsKeyDown(Keys.M) && oldState.IsKeyUp(Keys.M))
+                {
+                    currentState = BattleState.MainMenu;
+                }
+            }
+
+            if (currentState == BattleState.Victory && kstate.IsKeyDown(Keys.Enter) && oldState.IsKeyUp(Keys.Enter))
+            {
+                currentState = BattleState.MainMenu;
+            }
+
+            oldState = kstate;
+            base.Update(gameTime);
+            return;
+        }
 
         foreach (var ally in allies)
         {
@@ -528,12 +579,67 @@ public class Game1 : Game
         _spriteBatch.DrawString(gameFont, mpText, new Vector2(textPos.X + 1, textPos.Y + 1), Color.Black, 0, Vector2.Zero, 0.55f, SpriteEffects.None, 0);
         _spriteBatch.DrawString(gameFont, mpText, textPos, Color.DeepSkyBlue, 0, Vector2.Zero, 0.55f, SpriteEffects.None, 0);
     }
+
+    private void ResetWholeGame()
+    {
+        currentWave = 1;
+        activeunitindex = 0;
+        enemyIndex = 0;
+        selectedskillind = 0;
+        selectedtargetind = 0;
+        isskillselected = false;
+        isRenatoUltimateUnlocked = false;
+        isYaserUltimateUnlocked = false;
+        isLeroyUltimateUnlocked = false;
+
+        allies.Clear();
+        enemies.Clear();
+
+        Initialize();
+    }
     protected override void Draw(GameTime gameTime)
     {
         GraphicsDevice.Clear(Color.CornflowerBlue);
         _spriteBatch.Begin();
-        int bgIndex = currentWave - 1;
 
+        if (currentState == BattleState.MainMenu)
+        {
+            if (battlegrounds.Count > 0)
+            {
+                Rectangle screenBounds = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
+                _spriteBatch.Draw(battlegrounds[0], screenBounds, Color.White * 0.5f);
+            }
+
+            string titleText = "TURN BASED RPG";
+            Vector2 titleSize = gameFont.MeasureString(titleText) * 2.0f;
+            Vector2 titlePos = new Vector2(GraphicsDevice.Viewport.Width / 2 - titleSize.X / 2, 80);
+            _spriteBatch.DrawString(gameFont, titleText, titlePos + new Vector2(2, 2), Color.Black, 0f, Vector2.Zero, 2.0f, SpriteEffects.None, 0f);
+            _spriteBatch.DrawString(gameFont, titleText, titlePos, Color.Gold, 0f, Vector2.Zero, 2.0f, SpriteEffects.None, 0f);
+
+            string playText = "PLAY GAME";
+            Vector2 playSize = gameFont.MeasureString(playText) * 1.2f;
+            Vector2 playPos = new Vector2(GraphicsDevice.Viewport.Width / 2 - playSize.X / 2, 220);
+            _spriteBatch.DrawString(gameFont, playText, playPos + new Vector2(1, 1), Color.Black, 0f, Vector2.Zero, 1.2f, SpriteEffects.None, 0f);
+            _spriteBatch.DrawString(gameFont, playText, playPos, (menuIndex == 0) ? Color.Gold : Color.White, 0f, Vector2.Zero, 1.2f, SpriteEffects.None, 0f);
+
+            string exitText = "EXIT TO DESKTOP";
+            Vector2 exitSize = gameFont.MeasureString(exitText) * 1.2f;
+            Vector2 exitPos = new Vector2(GraphicsDevice.Viewport.Width / 2 - exitSize.X / 2, 280);
+            _spriteBatch.DrawString(gameFont, exitText, exitPos + new Vector2(1, 1), Color.Black, 0f, Vector2.Zero, 1.2f, SpriteEffects.None, 0f);
+            _spriteBatch.DrawString(gameFont, exitText, exitPos, (menuIndex == 1) ? Color.Gold : Color.White, 0f, Vector2.Zero, 1.2f, SpriteEffects.None, 0f);
+
+            Vector2 arrowPos = (menuIndex == 0) ? new Vector2(playPos.X - 30, playPos.Y) : new Vector2(exitPos.X - 30, exitPos.Y);
+            _spriteBatch.DrawString(gameFont, ">", arrowPos, Color.Gold, 0f, Vector2.Zero, 1.2f, SpriteEffects.None, 0f);
+
+            _spriteBatch.End();
+            return;
+        }
+
+
+
+
+
+        int bgIndex = currentWave - 1;
         if (bgIndex >= battlegrounds.Count)
         {
             bgIndex = battlegrounds.Count - 1;
@@ -617,101 +723,106 @@ public class Game1 : Game
 
         if (currentState == BattleState.PlayerTurn)
         {
-            if (activeunitindex < 0 || activeunitindex >= allies.Count)
+            if (activeunitindex >= 0 && activeunitindex < allies.Count)
             {
-                _spriteBatch.End();
-                return;
-            }
+                var currentPlayer = allies[activeunitindex];
+                List<SkillInfo> currentSkills = new List<SkillInfo>();
 
-            var currentPlayer = allies[activeunitindex];
-            List<SkillInfo> currentSkills = new List<SkillInfo>();
-
-            if (currentPlayer.Name == "Leroy")
-            {
-                currentSkills.Add(new SkillInfo("1. Sword Attack", $"{currentPlayer.Attackpower} DMG", "0 MP", "Gains 10 MP."));
-                currentSkills.Add(new SkillInfo("2. Double Trouble", $"{currentPlayer.Attackpower * 2} DMG", "15 MP", "Deal 2x DMG, take 2x DMG."));
-                currentSkills.Add(new SkillInfo("3. Sword Rain", $"{currentPlayer.Attackpower} AOE", "10 MP", "Blasts all enemies with a sword Rain."));
-                currentSkills.Add(new SkillInfo("4. Guardian Stance", "0 DMG", "10 MP", "Enters stance. Cuts incoming DMG by 4."));
-            }
-            else if (currentPlayer.Name == "Renato")
-            {
-                currentSkills.Add(new SkillInfo("1. Quick Slash", $"{currentPlayer.Attackpower} DMG", "0 MP", "Gains 10 MP"));
-                currentSkills.Add(new SkillInfo("2. Holy Heal", "30 HEAL", "15 MP", "Restores HP to an ally."));
-                currentSkills.Add(new SkillInfo("3. Moonlight Power", "0 DMG", "20 MP", "Gives ATK Power buff to all allies."));
-                currentSkills.Add(new SkillInfo("4. Final Sacrifice", "INSTANT KILL", "30 MP", "Kills single target, but Sacrifices himself."));
-            }
-            else if (currentPlayer.Name == "Yaser")
-            {
-                currentSkills.Add(new SkillInfo("1. Basic Attack", $"{currentPlayer.Attackpower} DMG", "0 MP", "Gains 10 MP on hit."));
-                currentSkills.Add(new SkillInfo("2. Chain Lightning", "30 SPLIT", "10 MP", "Deals 30 DMG split among all living enemies."));
-                currentSkills.Add(new SkillInfo("3. Mana Battery", "+30 MANA", "0 MP", "Gives 30 MP to an ally. Cost: 0 MP."));
-                currentSkills.Add(new SkillInfo("4. Void Apocalypse", "ALL MP DMG", "30 MP", "Consumes ALL MP. Deals DMG equal to spent MP."));
-            }
-
-            int menuWidth = 400;
-            int menuHeight = currentSkills.Count * 45 + 10;
-
-            int menuX = (int)currentPlayer.Position.X + 25 - (menuWidth / 2);
-            int menuY = (int)currentPlayer.Position.Y - menuHeight - 60;
-
-            if (menuX < 10) menuX = 10;
-            if (menuY < 10) menuY = 10;
-
-            _spriteBatch.Draw(pixel, new Rectangle(menuX - 2, menuY - 2, menuWidth + 4, menuHeight + 4), Color.Black);
-            _spriteBatch.Draw(pixel, new Rectangle(menuX, menuY, menuWidth, menuHeight), Color.Black * 0.8f);
-
-            for (int i = 0; i < currentSkills.Count; i++)
-            {
-                bool isSelected = (selectedskillind == i);
-                Color titleColor = isSelected ? Color.Gold : Color.White;
-                Color boxColor = isSelected ? Color.Gold * 0.25f : Color.Transparent;
-
-                int slotX = menuX + 15;
-                int slotY = menuY + 8 + (i * 45);
-
-                if (isSelected)
+                if (currentPlayer.Name == "Leroy")
                 {
-                    _spriteBatch.Draw(pixel, new Rectangle(menuX + 4, slotY - 4, menuWidth - 8, 40), boxColor);
-                    _spriteBatch.Draw(pixel, new Rectangle(menuX + 4, slotY - 4, 3, 40), Color.Gold);
+                    currentSkills.Add(new SkillInfo("1. Sword Attack", $"{currentPlayer.Attackpower} DMG", "0 MP", "Gains 10 MP."));
+                    currentSkills.Add(new SkillInfo("2. Double Trouble", $"{currentPlayer.Attackpower * 2} DMG", "15 MP", "Deal 2x DMG, take 2x DMG."));
+                    currentSkills.Add(new SkillInfo("3. Sword Rain", $"{currentPlayer.Attackpower} AOE", "10 MP", "Blasts all enemies with a sword Rain."));
+                    currentSkills.Add(new SkillInfo("4. Guardian Stance", "0 DMG", "10 MP", "Enters stance. Cuts incoming DMG by 4."));
+                }
+                else if (currentPlayer.Name == "Renato")
+                {
+                    currentSkills.Add(new SkillInfo("1. Quick Slash", $"{currentPlayer.Attackpower} DMG", "0 MP", "Gains 10 MP"));
+                    currentSkills.Add(new SkillInfo("2. Holy Heal", "30 HEAL", "15 MP", "Restores HP to an ally."));
+                    currentSkills.Add(new SkillInfo("3. Moonlight Power", "0 DMG", "20 MP", "Gives ATK Power buff to all allies."));
+                    currentSkills.Add(new SkillInfo("4. Final Sacrifice", "INSTANT KILL", "30 MP", "Kills single target, but Sacrifices himself."));
+                }
+                else if (currentPlayer.Name == "Yaser")
+                {
+                    currentSkills.Add(new SkillInfo("1. Basic Attack", $"{currentPlayer.Attackpower} DMG", "0 MP", "Gains 10 MP on hit."));
+                    currentSkills.Add(new SkillInfo("2. Chain Lightning", "30 SPLIT", "10 MP", "Deals 30 DMG split among all living enemies."));
+                    currentSkills.Add(new SkillInfo("3. Mana Battery", "+30 MANA", "0 MP", "Gives 30 MP to an ally. Cost: 0 MP."));
+                    currentSkills.Add(new SkillInfo("4. Void Apocalypse", "ALL MP DMG", "30 MP", "Consumes ALL MP. Deals DMG equal to spent MP."));
                 }
 
-                string skillTitle = currentSkills[i].Name;
-                string statsText = $" [{currentSkills[i].DamageText}] [{currentSkills[i].CostText}]";
+                int menuWidth = 400;
+                int menuHeight = currentSkills.Count * 45 + 10;
 
-                _spriteBatch.DrawString(gameFont, skillTitle, new Vector2(slotX + 1, slotY + 1), Color.Black);
-                _spriteBatch.DrawString(gameFont, skillTitle, new Vector2(slotX, slotY), titleColor);
+                int menuX = (int)currentPlayer.Position.X + 25 - (menuWidth / 2);
+                int menuY = (int)currentPlayer.Position.Y - menuHeight - 60;
 
-                Vector2 titleSize = gameFont.MeasureString(skillTitle);
-                _spriteBatch.DrawString(gameFont, statsText, new Vector2(slotX + titleSize.X + 11, slotY + 1), Color.Black);
-                _spriteBatch.DrawString(gameFont, statsText, new Vector2(slotX + titleSize.X + 10, slotY), isSelected ? Color.Cyan : Color.LightGray);
+                if (menuX < 10) menuX = 10;
+                if (menuY < 10) menuY = 10;
 
-                string desc = currentSkills[i].Description;
-                _spriteBatch.DrawString(gameFont, desc, new Vector2(slotX + 1, slotY + 21), Color.Black, 0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0f);
-                _spriteBatch.DrawString(gameFont, desc, new Vector2(slotX, slotY + 20), Color.DarkGray, 0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0f);
+                _spriteBatch.Draw(pixel, new Rectangle(menuX - 2, menuY - 2, menuWidth + 4, menuHeight + 4), Color.Black);
+                _spriteBatch.Draw(pixel, new Rectangle(menuX, menuY, menuWidth, menuHeight), Color.Black * 0.8f);
+
+                for (int i = 0; i < currentSkills.Count; i++)
+                {
+                    bool isSelected = (selectedskillind == i);
+                    Color titleColor = isSelected ? Color.Gold : Color.White;
+                    Color boxColor = isSelected ? Color.Gold * 0.25f : Color.Transparent;
+
+                    int slotX = menuX + 15;
+                    int slotY = menuY + 8 + (i * 45);
+
+                    if (isSelected)
+                    {
+                        _spriteBatch.Draw(pixel, new Rectangle(menuX + 4, slotY - 4, menuWidth - 8, 40), boxColor);
+                        _spriteBatch.Draw(pixel, new Rectangle(menuX + 4, slotY - 4, 3, 40), Color.Gold);
+                    }
+
+                    string skillTitle = currentSkills[i].Name;
+                    string statsText = $" [{currentSkills[i].DamageText}] [{currentSkills[i].CostText}]";
+
+                    _spriteBatch.DrawString(gameFont, skillTitle, new Vector2(slotX + 1, slotY + 1), Color.Black);
+                    _spriteBatch.DrawString(gameFont, skillTitle, new Vector2(slotX, slotY), titleColor);
+
+                    Vector2 titleSize = gameFont.MeasureString(skillTitle);
+                    _spriteBatch.DrawString(gameFont, statsText, new Vector2(slotX + titleSize.X + 11, slotY + 1), Color.Black);
+                    _spriteBatch.DrawString(gameFont, statsText, new Vector2(slotX + titleSize.X + 10, slotY), isSelected ? Color.Cyan : Color.LightGray);
+
+                    string desc = currentSkills[i].Description;
+                    _spriteBatch.DrawString(gameFont, desc, new Vector2(slotX + 1, slotY + 21), Color.Black, 0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0f);
+                    _spriteBatch.DrawString(gameFont, desc, new Vector2(slotX, slotY + 20), Color.DarkGray, 0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0f);
+                }
             }
         }
 
         if (currentState == BattleState.GameOver)
         {
             Rectangle screenBounds = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
-
             _spriteBatch.Draw(pixel, screenBounds, Color.Black * 0.65f);
             _spriteBatch.Draw(pixel, screenBounds, Color.Red * 0.08f);
 
             string goText = "GAME OVER";
             Vector2 goSize = gameFont.MeasureString(goText) * 2.5f;
-            Vector2 goPos = new Vector2(GraphicsDevice.Viewport.Width / 2 - goSize.X / 2, GraphicsDevice.Viewport.Height / 2 - goSize.Y / 2 - 30);
-
-            _spriteBatch.DrawString(gameFont, goText, new Vector2(goPos.X + 3, goPos.Y + 3), Color.Black, 0f, Vector2.Zero, 2.5f, SpriteEffects.None, 0f);
+            Vector2 goPos = new Vector2(GraphicsDevice.Viewport.Width / 2 - goSize.X / 2, GraphicsDevice.Viewport.Height / 2 - goSize.Y / 2 - 40);
+            _spriteBatch.DrawString(gameFont, goText, goPos + new Vector2(3, 3), Color.Black, 0f, Vector2.Zero, 2.5f, SpriteEffects.None, 0f);
             _spriteBatch.DrawString(gameFont, goText, goPos, Color.Crimson, 0f, Vector2.Zero, 2.5f, SpriteEffects.None, 0f);
 
-            string restartText = "Press [ R ] to Retry the Battle";
-            Vector2 restartSize = gameFont.MeasureString(restartText) * 0.9f;
-            Vector2 restartPos = new Vector2(GraphicsDevice.Viewport.Width / 2 - restartSize.X / 2, goPos.Y + goSize.Y + 20);
+            string retryText = "[R] Retry the Battle";
+            string mainMenuText = "[M] Return to Main Menu";
 
-            _spriteBatch.DrawString(gameFont, restartText, new Vector2(restartPos.X + 1, restartPos.Y + 1), Color.Black, 0f, Vector2.Zero, 0.9f, SpriteEffects.None, 0f);
-            _spriteBatch.DrawString(gameFont, restartText, restartPos, Color.LightGray, 0f, Vector2.Zero, 0.9f, SpriteEffects.None, 0f);
+            Vector2 rSize = gameFont.MeasureString(retryText) * 1.0f;
+            Vector2 mSize = gameFont.MeasureString(mainMenuText) * 1.0f;
+
+            Vector2 rPos = new Vector2(GraphicsDevice.Viewport.Width / 2 - rSize.X / 2, goPos.Y + goSize.Y + 20);
+            Vector2 mPos = new Vector2(GraphicsDevice.Viewport.Width / 2 - mSize.X / 2, rPos.Y + 35);
+
+            _spriteBatch.DrawString(gameFont, retryText, rPos + new Vector2(1, 1), Color.Black, 0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0f);
+            _spriteBatch.DrawString(gameFont, retryText, rPos, Color.LightGray, 0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0f);
+
+            _spriteBatch.DrawString(gameFont, mainMenuText, mPos + new Vector2(1, 1), Color.Black, 0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0f);
+            _spriteBatch.DrawString(gameFont, mainMenuText, mPos, Color.LightGray, 0f, Vector2.Zero, 1.0f, SpriteEffects.None, 0f);
         }
+
+
 
         if (currentState == BattleState.Victory)
         {
