@@ -688,6 +688,7 @@ public class BaseCharacter
 
     public virtual void TakeDamage(int damage)
     {
+
         CurrentHP -= damage;
         if (CurrentHP <= 0)
         {

@@ -7,19 +7,34 @@ using SharpDX.DXGI;
 public class Enemy : BaseCharacter
 {
     public int UIIndex { get; set; }
+
+    public string activeSkillText = "";
+    public float skillTextTimer = 0f;
     public Enemy(string name, int hp, int atk, Vector2 pos) : base(name, hp, atk, pos) { }
+
+    public void UpdateSkillTimer(GameTime gameTime)
+    {
+        if (skillTextTimer > 0f)
+        {
+            skillTextTimer -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (skillTextTimer <= 0f)
+            {
+                activeSkillText = "";
+            }
+        }
+    }
 
     public void TakeTurn(List<Player> allies, List<Enemy> enemies)
     {
         if (CurrentHP <= 0)
         {
-            System.Diagnostics.Debug.WriteLine($"{Name} öldüğü için turn atlıyor.");
+
             return;
         }
 
         if (allies == null || allies.Count == 0)
         {
-            System.Diagnostics.Debug.WriteLine("Saldıracak oyuncu kalmadı, yapay zeka turn atlıyor.");
+
             return;
         }
         System.Random rnd = new System.Random();
@@ -65,6 +80,8 @@ public class Vampire : Enemy
 
     public override bool ExecuteSkill(int skillIndex, List<Player> allies, List<Enemy> enemies, int targetIndex, bool isultimateunlocked)
     {
+        this.activeSkillText = " LIFE DRAIN ";
+        this.skillTextTimer = 2.0f;
         allies[targetIndex].TakeDamage(Attackpower);
         System.Diagnostics.Debug.WriteLine($"{Name} uses Life Drain on {allies[targetIndex].Name}!");
         this.Heal(10);
@@ -94,6 +111,8 @@ public class Skeleton : Enemy
 
     public override bool ExecuteSkill(int skillIndex, List<Player> allies, List<Enemy> enemies, int targetIndex, bool isultimateunlocked)
     {
+        this.activeSkillText = " SHIELD CRUSH ";
+        this.skillTextTimer = 2.0f;
         allies[targetIndex].TakeDamage(Attackpower + 10);
         System.Diagnostics.Debug.WriteLine("Skeleton uses Shield Crush for extra damage!");
         return true;
@@ -125,13 +144,17 @@ public class Bat : Enemy
         var target = allies[targetIndex];
         int baseDamage = Attackpower;
 
-        if (target.CurrentHP < (target.MaxHP / 2))
+        if (this.CurrentHP < (this.MaxHP / 2))
         {
-            baseDamage = (int)(baseDamage * 2.5f);
-            System.Diagnostics.Debug.WriteLine($"⚠️ {Name} enjected Vampiric Venom into a weak target! Deadly Damage!");
+            baseDamage = (int)(baseDamage * 2f);
+            this.activeSkillText = " FRENZIED BITE ";
+            this.skillTextTimer = 2.0f;
+            System.Diagnostics.Debug.WriteLine($" {Name} used Frenzied Bite! Injected venom, dealt {baseDamage} DMG");
         }
 
         target.TakeDamage(baseDamage);
+
+        System.Console.WriteLine($"{Name} scratches {target.Name} for {baseDamage} damage!");
         return true;
     }
 }
@@ -158,9 +181,13 @@ public class EvilWizard : Enemy
 
     public override bool ExecuteSkill(int skillIndex, List<Player> allies, List<Enemy> enemies, int targetIndex, bool isultimateunlocked)
     {
+
         allies[targetIndex].TakeDamage(Attackpower);
         allies[targetIndex].CurrentMP -= 15; if (allies[targetIndex].CurrentMP < 0) allies[targetIndex].CurrentMP = 0;
-        System.Diagnostics.Debug.WriteLine($"{Name} drained {15} MP from {allies[targetIndex].Name}"); return true;
+        System.Diagnostics.Debug.WriteLine($"{Name} drained {15} MP from {allies[targetIndex].Name}");
+        this.activeSkillText = " MANA DRAIN ";
+        this.skillTextTimer = 2.0f;
+        return true;
     }
 }
 
@@ -187,6 +214,8 @@ public class Sorcerer : Enemy
         Enemy weakestAlly = enemies[0];
         foreach (var e in enemies) { if (e.CurrentHP < weakestAlly.CurrentHP) weakestAlly = e; }
         weakestAlly.Heal(20);
+        this.activeSkillText = " HOLY HEAL ";
+        this.skillTextTimer = 2.0f;
         System.Diagnostics.Debug.WriteLine($"{Name} healed {weakestAlly.Name}!"); return true;
     }
 }
@@ -216,6 +245,8 @@ public class Zombie : Enemy
         allies[targetIndex].TakeDamage(Attackpower);
         allies[targetIndex].Attackpower = allies[targetIndex].BaseAttackPower / 2;
         System.Diagnostics.Debug.WriteLine($"{allies[targetIndex].Name}'s attack is weakened by bite from {Name}!");
+        this.activeSkillText = " WEAKENING BITE ";
+        this.skillTextTimer = 2.0f;
         return true;
     }
 }
@@ -271,6 +302,8 @@ public class FinalBoss : Enemy
             currentFrame = 0;
             animationTimer = 0f;
             System.Diagnostics.Debug.WriteLine($"{Name} uses VOID BLAST on {allies[targetIndex].Name}!");
+            this.activeSkillText = " VOID BLAST ";
+            this.skillTextTimer = 2.5f;
 
 
             foreach (var player in allies)
@@ -284,6 +317,9 @@ public class FinalBoss : Enemy
             currentFrame = 0;
             animationTimer = 0f;
 
+            this.activeSkillText = " METEOR STRIKE ";
+            this.skillTextTimer = 2.5f;
+
 
             System.Diagnostics.Debug.WriteLine($"{Name} uses METEOR STRIKE! Everyone takes damage!");
             allies[targetIndex].TakeDamage(Attackpower);
@@ -292,6 +328,8 @@ public class FinalBoss : Enemy
         if (CurrentHP < (MaxHP * 0.3f))
         {
             Attackpower = 40;
+            this.activeSkillText = " FINAL BOSS ENRAGED! ";
+            this.skillTextTimer = 3.0f;
             System.Diagnostics.Debug.WriteLine($"{Name} is ENRAGED! Attack power increased!");
         }
 

@@ -1,3 +1,2 @@
 Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
-"c:/Users/erens/Desktop/Create With Code/Board game/Gameprogram22/gamealien/Content/Audio/BattleMusic.mp3","c:/Users/erens/Desktop/Create With Code/Board game/Gameprogram22/gamealien/Content/bin/Windows/Audio/BattleMusic.xnb","SongProcessor","SongContent",6436423,129,4,2483816
-"c:/Users/erens/Desktop/Create With Code/Board game/Gameprogram22/gamealien/Content/Audio/MainMenuMusic.mp3","c:/Users/erens/Desktop/Create With Code/Board game/Gameprogram22/gamealien/Content/bin/Windows/Audio/MainMenuMusic.xnb","SongProcessor","SongContent",2179783,131,0,5456407
+"c:/Users/erens/Desktop/Create With Code/Board game/Gameprogram22/gamealien/Content/Death.mp3","c:/Users/erens/Desktop/Create With Code/Board game/Gameprogram22/gamealien/Content/bin/Windows/Death.xnb","SoundEffectProcessor","SoundEffectContent",22080,106089,0,1991829

@@ -26,6 +26,18 @@ public class Game1 : Game
     Song mainMenuMusic;
     Song battleMusic;
 
+    Microsoft.Xna.Framework.Audio.SoundEffect leroyAttackSound;
+    Microsoft.Xna.Framework.Audio.SoundEffect renatoAttackSound;
+    Microsoft.Xna.Framework.Audio.SoundEffect renatoHealSound;
+    Microsoft.Xna.Framework.Audio.SoundEffect renatoPowerupSound;
+    Microsoft.Xna.Framework.Audio.SoundEffect yaserAttackSound;
+
+    Microsoft.Xna.Framework.Audio.SoundEffect allyDeathSound;
+
+
+
+
+
     int menuIndex = 0;
     int activeunitindex = 0;
 
@@ -55,7 +67,7 @@ public class Game1 : Game
 
     protected override void Initialize()
     {
-        allies.Add(new Player.Leroy("Leroy", 100, 60, 999, new Vector2(300, 255)));
+        allies.Add(new Player.Leroy("Leroy", 100, 60, 25, new Vector2(300, 255)));
         allies.Add(new Player.Renato("Renato", 70, 60, 15, new Vector2(150, 255)));
         allies.Add(new Player.Yaser("Yaser", 70, 60, 20, new Vector2(0, 200)));
 
@@ -82,6 +94,13 @@ public class Game1 : Game
         battlegrounds.Add(Content.Load<Texture2D>("Backgrounds/Battleground4"));
         mainMenuMusic = Content.Load<Song>("Audio/MainMenuMusic");
         battleMusic = Content.Load<Song>("Audio/BattleMusic");
+
+        leroyAttackSound = Content.Load<Microsoft.Xna.Framework.Audio.SoundEffect>("Sword");
+        renatoAttackSound = Content.Load<Microsoft.Xna.Framework.Audio.SoundEffect>("Sword2");
+        renatoHealSound = Content.Load<Microsoft.Xna.Framework.Audio.SoundEffect>("Heal");
+        renatoPowerupSound = Content.Load<Microsoft.Xna.Framework.Audio.SoundEffect>("Powerup");
+        yaserAttackSound = Content.Load<Microsoft.Xna.Framework.Audio.SoundEffect>("YaserAttack");
+        allyDeathSound = Content.Load<Microsoft.Xna.Framework.Audio.SoundEffect>("Death");
 
         MediaPlayer.IsRepeating = true;
 
@@ -134,27 +153,27 @@ public class Game1 : Game
 
         }
         Vampire.LoadSprites(this.Content);
-        System.Diagnostics.Debug.WriteLine("✅ KUTSALLIK: Vampir resimleri static olarak hafızaya alındı.");
+
 
         Skeleton.LoadSprites(this.Content);
-        System.Diagnostics.Debug.WriteLine("✅ KUTSALLIK: Skeleton resimleri static olarak hafızaya alındı.");
+
 
         Bat.LoadSprites(this.Content);
-        System.Diagnostics.Debug.WriteLine("✅ KUTSALLIK: Yarasa (Bat) resimleri static olarak hafızaya alındı.");
+
 
         EvilWizard.LoadSprites(this.Content);
-        System.Diagnostics.Debug.WriteLine("✅ KUTSALLIK: EvilWizard resimleri static olarak hafızaya alındı.");
+
 
         Sorcerer.LoadSprites(this.Content);
-        System.Diagnostics.Debug.WriteLine("✅ KUTSALLIK: Sorcerer resimleri static olarak hafızaya alındı.");
+
 
         Zombie.LoadSprites(this.Content);
-        System.Diagnostics.Debug.WriteLine("✅ KUTSALLIK: Zombie resimleri static olarak hafızaya alındı.");
+
 
         FinalBoss.LoadSprites(this.Content);
-        System.Diagnostics.Debug.WriteLine("✅ KUTSALLIK: FinalBoss tekil resimleri hafızaya alındı.");
 
-        MediaPlayer.Volume = 0.4f;
+
+        MediaPlayer.Volume = 0.8f;
 
 
 
@@ -194,13 +213,15 @@ public class Game1 : Game
             {
                 if (kstate.IsKeyDown(Keys.R) && oldState.IsKeyUp(Keys.R))
                 {
-                    ResetWholeGame();
                     currentState = BattleState.PlayerTurn;
-                    MediaPlayer.Play(battleMusic);
+                    ResetWholeGame();
+
+
                 }
                 if (kstate.IsKeyDown(Keys.M) && oldState.IsKeyUp(Keys.M))
                 {
                     currentState = BattleState.MainMenu;
+                    MediaPlayer.Volume = 0.8f;
                     MediaPlayer.Play(mainMenuMusic);
                 }
             }
@@ -208,6 +229,7 @@ public class Game1 : Game
             if (currentState == BattleState.Victory && kstate.IsKeyDown(Keys.Enter) && oldState.IsKeyUp(Keys.Enter))
             {
                 currentState = BattleState.MainMenu;
+                Microsoft.Xna.Framework.Media.MediaPlayer.Volume = 1.0f;
                 MediaPlayer.Play(mainMenuMusic);
             }
 
@@ -224,6 +246,7 @@ public class Game1 : Game
         foreach (var enemy in enemies)
         {
             enemy.UpdateAnimation(gameTime);
+            enemy.UpdateSkillTimer(gameTime);
         }
 
         if (currentState == BattleState.GameOver || currentState == BattleState.Victory)
@@ -352,11 +375,33 @@ public class Game1 : Game
                         var currentPlayer = allies[activeunitindex];
 
                         if (currentPlayer is Player.Renato)
+                        {
                             success = currentPlayer.ExecuteSkill(selectedskillind, allies, enemies, selectedtargetind, isRenatoUltimateUnlocked);
+                            if (success)
+                            {
+                                if (selectedskillind == 0 || selectedskillind == 3) renatoAttackSound.Play();
+                                else if (selectedskillind == 1) renatoHealSound.Play();
+                                else if (selectedskillind == 2) renatoPowerupSound.Play();
+                            }
+                        }
                         else if (currentPlayer is Player.Yaser)
+                        {
                             success = currentPlayer.ExecuteSkill(selectedskillind, allies, enemies, selectedtargetind, isYaserUltimateUnlocked);
+                            if (success)
+                            {
+                                yaserAttackSound.Play();
+                            }
+                        }
                         else if (currentPlayer is Player.Leroy)
+                        {
                             success = currentPlayer.ExecuteSkill(selectedskillind, allies, enemies, selectedtargetind, isLeroyUltimateUnlocked);
+                            if (success)
+                            {
+                                leroyAttackSound.Play();
+                            }
+                        }
+
+
 
                         if (success)
                         {
@@ -448,9 +493,15 @@ public class Game1 : Game
             {
                 if (allies[i].CurrentState != BaseCharacter.CharacterState.Dead)
                 {
+
+
+                    allyDeathSound.Play();
+
                     allies[i].CurrentState = BaseCharacter.CharacterState.Dead;
                     allies[i].currentFrame = 0;
-                    System.Diagnostics.Debug.WriteLine($"{allies[i].Name} elendi, ölüm animasyonu tetiklendi.");
+
+
+
                 }
 
 
@@ -471,10 +522,23 @@ public class Game1 : Game
         }
 
         allies.RemoveAll(ally =>
-            (ally.Name == "Yaser" && ally.CurrentState == BaseCharacter.CharacterState.Dead && ally.currentFrame >= 6) ||
-            (ally.Name == "Renato" && ally.CurrentState == BaseCharacter.CharacterState.Dead && ally.currentFrame >= 3) ||
-            (ally.Name == "Leroy" && ally.CurrentState == BaseCharacter.CharacterState.Dead && ally.currentFrame >= 5)
-        );
+         {
+             bool shouldRemove = (ally.Name == "Yaser" && ally.CurrentState == BaseCharacter.CharacterState.Dead && ally.currentFrame >= 6) ||
+                                (ally.Name == "Renato" && ally.CurrentState == BaseCharacter.CharacterState.Dead && ally.currentFrame >= 3) ||
+                                (ally.Name == "Leroy" && ally.CurrentState == BaseCharacter.CharacterState.Dead && ally.currentFrame >= 5);
+
+             if (shouldRemove)
+             {
+                 if (allyDeathSound != null)
+                 {
+                     allyDeathSound.Play();
+                 }
+                 System.Diagnostics.Debug.WriteLine($"💀 {ally.Name} listeden siliniyor, ölüm sesi çalındı.");
+             }
+
+             return shouldRemove;
+         });
+
         enemies.RemoveAll(enemy =>
              (enemy is Vampire && enemy.CurrentState == BaseCharacter.CharacterState.Dead && enemy.currentFrame >= 7) ||
              (enemy is Skeleton && enemy.CurrentState == BaseCharacter.CharacterState.Dead && enemy.currentFrame >= 3) ||
@@ -510,12 +574,12 @@ public class Game1 : Game
                     activeunitindex = 0;
                     enemyIndex = 0;
                     enemyTurnTimer = 0f;
-                    System.Diagnostics.Debug.WriteLine("Oyuncu turu bitti. SIRA DÜŞMANDA!");
+                    System.Diagnostics.Debug.WriteLine("Player turn ended. Enemies are taking their turn.");
                 }
                 else
                 {
                     currentState = BattleState.GameOver;
-                    System.Diagnostics.Debug.WriteLine("Tüm müttefikler öldü! GAME OVER!");
+                    System.Diagnostics.Debug.WriteLine("All allies are dead. GAME OVER!");
                 }
             }
 
@@ -611,6 +675,10 @@ public class Game1 : Game
         enemies.Clear();
 
         Initialize();
+
+        MediaPlayer.Volume = 0.1f;
+
+        MediaPlayer.Play(battleMusic);
     }
     protected override void Draw(GameTime gameTime)
     {
@@ -733,6 +801,21 @@ public class Game1 : Game
             _spriteBatch.DrawString(gameFont, enemyName, new Vector2(enemyNamePos.X + 1, enemyNamePos.Y + 1), Color.Black);
             _spriteBatch.DrawString(gameFont, enemyName, enemyNamePos, enemyNameColor);
 
+            if (!string.IsNullOrEmpty(enemies[i].activeSkillText))
+            {
+                string skillText = enemies[i].activeSkillText;
+                Vector2 skillSize = gameFont.MeasureString(skillText);
+
+                Vector2 skillPos = new Vector2(enemyUiX + (50 / 2) - (skillSize.X / 2), enemyNamePos.Y - 25);
+
+                _spriteBatch.DrawString(gameFont, skillText, skillPos + new Vector2(1, 1), Color.Black);
+                _spriteBatch.DrawString(gameFont, skillText, skillPos + new Vector2(-1, 1), Color.Black);
+                _spriteBatch.DrawString(gameFont, skillText, skillPos + new Vector2(1, -1), Color.Black);
+
+                Color skillColor = (enemies[i] is FinalBoss && enemies[i].CurrentHP < (enemies[i].MaxHP * 0.3f)) ? Color.OrangeRed : Color.Violet;
+                _spriteBatch.DrawString(gameFont, skillText, skillPos, skillColor);
+            }
+
             DrawHealthBar(new Vector2(enemyUiX, enemyUiY + 20), enemies[i].CurrentHP, enemies[i].MaxHP);
         }
 
@@ -759,7 +842,7 @@ public class Game1 : Game
                 }
                 else if (currentPlayer.Name == "Yaser")
                 {
-                    currentSkills.Add(new SkillInfo("1. Basic Attack", $"{currentPlayer.Attackpower} DMG", "0 MP", "Gains 10 MP on hit."));
+                    currentSkills.Add(new SkillInfo("1. Magic Strike", $"{currentPlayer.Attackpower} DMG", "0 MP", "Gains 10 MP on hit."));
                     currentSkills.Add(new SkillInfo("2. Chain Lightning", "30 SPLIT", "10 MP", "Deals 30 DMG split among all living enemies."));
                     currentSkills.Add(new SkillInfo("3. Mana Battery", "+30 MANA", "0 MP", "Gives 30 MP to an ally. Cost: 0 MP."));
                     currentSkills.Add(new SkillInfo("4. Void Apocalypse", "ALL MP DMG", "30 MP", "Consumes ALL MP. Deals DMG equal to spent MP."));
@@ -853,7 +936,7 @@ public class Game1 : Game
             _spriteBatch.DrawString(gameFont, vicText, new Vector2(vicPos.X + 3, vicPos.Y + 3), Color.Black, 0f, Vector2.Zero, 2.5f, SpriteEffects.None, 0f);
             _spriteBatch.DrawString(gameFont, vicText, vicPos, Color.Gold, 0f, Vector2.Zero, 2.5f, SpriteEffects.None, 0f);
 
-            string congraText = "You have cleansed the battlefield!";
+            string congraText = "You defeated all of the enemies!";
             Vector2 congraSize = gameFont.MeasureString(congraText) * 0.9f;
             Vector2 congraPos = new Vector2(GraphicsDevice.Viewport.Width / 2 - congraSize.X / 2, vicPos.Y + vicSize.Y + 20);
 

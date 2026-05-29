@@ -97,7 +97,14 @@
     <File>c:/Users/erens/Desktop/Create With Code/Board game/Gameprogram22/gamealien/Content/Characters/Zombie/Death.png</File>
     <File>c:/Users/erens/Desktop/Create With Code/Board game/Gameprogram22/gamealien/Content/Characters/Zombie/Hurt.png</File>
     <File>c:/Users/erens/Desktop/Create With Code/Board game/Gameprogram22/gamealien/Content/Characters/Zombie/Idle.png</File>
+    <File>c:/Users/erens/Desktop/Create With Code/Board game/Gameprogram22/gamealien/Content/Death.mp3</File>
     <File>c:/Users/erens/Desktop/Create With Code/Board game/Gameprogram22/gamealien/Content/File.spritefont</File>
+    <File>c:/Users/erens/Desktop/Create With Code/Board game/Gameprogram22/gamealien/Content/Heal.mp3</File>
+    <File>c:/Users/erens/Desktop/Create With Code/Board game/Gameprogram22/gamealien/Content/Hurt.mp3</File>
+    <File>c:/Users/erens/Desktop/Create With Code/Board game/Gameprogram22/gamealien/Content/Powerup.mp3</File>
+    <File>c:/Users/erens/Desktop/Create With Code/Board game/Gameprogram22/gamealien/Content/Sword.mp3</File>
+    <File>c:/Users/erens/Desktop/Create With Code/Board game/Gameprogram22/gamealien/Content/Sword2.mp3</File>
+    <File>c:/Users/erens/Desktop/Create With Code/Board game/Gameprogram22/gamealien/Content/YaserAttack.mp3</File>
   </SourceFiles>
   <DestFiles>
     <File xsi:nil="true" />
@@ -193,6 +200,13 @@
     <File xsi:nil="true" />
     <File xsi:nil="true" />
     <File xsi:nil="true" />
+    <File xsi:nil="true" />
     <File>Gamefont.spritefont</File>
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
   </DestFiles>
 </SourceFileCollection>

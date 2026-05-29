@@ -54,7 +54,7 @@ public class Player : BaseCharacter
             int skill2manacost = 20;
             int skill3manacost = 10;
             int skill4manacost = 10;
-            System.Diagnostics.Debug.WriteLine($"LEROY ATAK GUCU: {this.Attackpower}");
+
             if (skillIndex == 0)
             {
                 if (CurrentMP >= skill1manacost)
@@ -117,6 +117,7 @@ public class Player : BaseCharacter
 
         public override void TakeDamage(int damage)
         {
+
 
             if (DoubleTroubleActive) damage *= 2;
             if (IsGuarding) damage /= 4;
@@ -184,7 +185,7 @@ public class Player : BaseCharacter
                     foreach (var a in allies)
                     {
                         a.Attackpower = a.BaseAttackPower + 20;
-                        System.Diagnostics.Debug.WriteLine($"BUFFLANDI -> {a.Name}, Yeni Atak: {a.Attackpower}");
+                        System.Diagnostics.Debug.WriteLine($"BUFFED -> {a.Name}, New Attack Power: {a.Attackpower}");
 
                     }
                     return true;
@@ -286,7 +287,7 @@ public class Player : BaseCharacter
                     if (allies[targetIndex].CurrentMP > allies[targetIndex].MaxMP)
                         allies[targetIndex].CurrentMP = allies[targetIndex].MaxMP;
 
-                    System.Console.WriteLine($"{Name}, {allies[targetIndex].Name} kişisine 30 Mana bastı!");
+                    System.Console.WriteLine($"{Name}, gave 30 Mana! to {allies[targetIndex].Name}!");
                     return true;
                 }
             }
