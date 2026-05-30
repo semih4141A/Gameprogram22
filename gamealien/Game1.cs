@@ -693,7 +693,7 @@ public class Game1 : Game
                 _spriteBatch.Draw(battlegrounds[0], screenBounds, Color.White * 0.5f);
             }
 
-            string titleText = "TURN BASED RPG";
+            string titleText = "TRIO OF DESTINY";
             Vector2 titleSize = gameFont.MeasureString(titleText) * 2.0f;
             Vector2 titlePos = new Vector2(GraphicsDevice.Viewport.Width / 2 - titleSize.X / 2, 80);
             _spriteBatch.DrawString(gameFont, titleText, titlePos + new Vector2(2, 2), Color.Black, 0f, Vector2.Zero, 2.0f, SpriteEffects.None, 0f);
@@ -863,31 +863,43 @@ public class Game1 : Game
                 for (int i = 0; i < currentSkills.Count; i++)
                 {
                     bool isSelected = (selectedskillind == i);
-                    Color titleColor = isSelected ? Color.Gold : Color.White;
-                    Color boxColor = isSelected ? Color.Gold * 0.25f : Color.Transparent;
+                    bool isUltiLocked = (i == 3) && (
+                        (currentPlayer.Name == "Renato" && !isRenatoUltimateUnlocked) ||
+                        (currentPlayer.Name == "Yaser" && !isYaserUltimateUnlocked) ||
+                        (currentPlayer.Name == "Leroy" && !isLeroyUltimateUnlocked)
+                    );
+                    float alpha = isUltiLocked ? 0.35f : 1.0f;
 
+                    Color titleColor = (isSelected ? Color.Gold : Color.White) * alpha;
+                    Color boxColor = isSelected ? (Color.Gold * 0.25f) * alpha : Color.Transparent;
+                    Color statsColor = (isSelected ? Color.Cyan : Color.LightGray) * alpha;
+                    Color descColor = Color.DarkGray * alpha;
+                    Color shadowColor = Color.Black * alpha; // Gölgeler de silikleşsin ki sırıtmasın
                     int slotX = menuX + 15;
                     int slotY = menuY + 8 + (i * 45);
 
                     if (isSelected)
                     {
                         _spriteBatch.Draw(pixel, new Rectangle(menuX + 4, slotY - 4, menuWidth - 8, 40), boxColor);
-                        _spriteBatch.Draw(pixel, new Rectangle(menuX + 4, slotY - 4, 3, 40), Color.Gold);
+                        _spriteBatch.Draw(pixel, new Rectangle(menuX + 4, slotY - 4, 3, 40), Color.Gold * alpha);
                     }
 
                     string skillTitle = currentSkills[i].Name;
+                    if (isUltiLocked) skillTitle += " (LOCKED)";
                     string statsText = $" [{currentSkills[i].DamageText}] [{currentSkills[i].CostText}]";
 
-                    _spriteBatch.DrawString(gameFont, skillTitle, new Vector2(slotX + 1, slotY + 1), Color.Black);
+                    _spriteBatch.DrawString(gameFont, skillTitle, new Vector2(slotX + 1, slotY + 1), shadowColor);
                     _spriteBatch.DrawString(gameFont, skillTitle, new Vector2(slotX, slotY), titleColor);
 
+                    // Değerler (DMG/MP) ve gölgesi
                     Vector2 titleSize = gameFont.MeasureString(skillTitle);
-                    _spriteBatch.DrawString(gameFont, statsText, new Vector2(slotX + titleSize.X + 11, slotY + 1), Color.Black);
-                    _spriteBatch.DrawString(gameFont, statsText, new Vector2(slotX + titleSize.X + 10, slotY), isSelected ? Color.Cyan : Color.LightGray);
+                    _spriteBatch.DrawString(gameFont, statsText, new Vector2(slotX + titleSize.X + 11, slotY + 1), shadowColor);
+                    _spriteBatch.DrawString(gameFont, statsText, new Vector2(slotX + titleSize.X + 10, slotY), statsColor);
 
+                    // Açıklama ve gölgesi
                     string desc = currentSkills[i].Description;
-                    _spriteBatch.DrawString(gameFont, desc, new Vector2(slotX + 1, slotY + 21), Color.Black, 0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0f);
-                    _spriteBatch.DrawString(gameFont, desc, new Vector2(slotX, slotY + 20), Color.DarkGray, 0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0f);
+                    _spriteBatch.DrawString(gameFont, desc, new Vector2(slotX + 1, slotY + 21), shadowColor, 0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0f);
+                    _spriteBatch.DrawString(gameFont, desc, new Vector2(slotX, slotY + 20), descColor, 0f, Vector2.Zero, 0.75f, SpriteEffects.None, 0f);
                 }
             }
         }
